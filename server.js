@@ -1,9 +1,17 @@
+require('dotenv').config();  // Load environment variables
 const express = require('express');
-const connectDB = require('./config/database'); // Import database connection function
+const connectDB = require('./config/database');
 
 const app = express();
-app.use(express.json());
 
-connectDB(); // Call the database connection function
+// Connect to MongoDB
+connectDB();
 
-app.listen(5000, () => console.log('🚀 Server running on port 5000'));
+app.get('/', (req, res) => {
+    res.send('Server is running');
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
