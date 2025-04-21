@@ -1,68 +1,90 @@
+// backend/controllers/bookingController.js
 const Booking = require('../models/Booking');
-const Event = require('../models/Event');
+const Event   = require('../models/Event');
 
-// Book Tickets (Standard User only)
+// 1. Book Tickets (Standard User only)
 exports.bookTickets = async (req, res) => {
   try {
     const { eventId, tickets } = req.body;
     const event = await Event.findById(eventId);
+    if (!event) 
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    if (event.ticketsAvailable < tickets) 
+      return res.status(400).json({ success: false, error: 'Not enough tickets available' });
 
-    if (!event) return res.status(404).json({ error: 'Event not found' });
-    if (event.ticketsAvailable < tickets) return res.status(400).json({ error: 'Not enough tickets available' });
-
-    // Calculate total price
-    const totalPrice = event.price * tickets;
+    // Deduct tickets and save
+    event.ticketsAvailable -= tickets;
+    await event.save();
 
     // Create booking
     const booking = await Booking.create({
       user: req.user.id,
       event: eventId,
       tickets,
-      totalPrice,
+      totalPrice: event.price * tickets
     });
 
-    // Update event's available tickets
-    event.ticketsAvailable -= tickets;
-    await event.save();
-
-    res.status(201).json({ success: true, data: booking });
+    return res.status(201).json({ success: true, data: booking });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+    console.error('bookTickets error:', err);
+    return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
 
-// Get User Bookings (Standard User only)
+// 2. List Current User's Bookings
 exports.getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user.id }).populate('event');
-    res.status(200).json({ success: true, data: bookings });
+    const bookings = await Booking
+      .find({ user: req.user.id })
+      .populate('event');
+    return res.status(200).json({ success: true, data: bookings });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+    console.error('getUserBookings error:', err);
+    return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
 
-// Cancel Booking (Standard User only)
+// 3. Get Booking by ID
+exports.getBookingById = async (req, res) => {
+  try {
+    const booking = await Booking
+      .findById(req.params.id)
+      .populate('event');
+    if (!booking) 
+      return res.status(404).json({ success: false, error: 'Booking not found' });
+    if (booking.user.toString() !== req.user.id) 
+      return res.status(403).json({ success: false, error: 'Access denied' });
+
+    return res.status(200).json({ success: true, data: booking });
+  } catch (err) {
+    console.error('getBookingById error:', err);
+    return res.status(500).json({ success: false, error: 'Server error' });
+  }
+};
+
+// 4. Cancel (Delete) Booking
 exports.cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    if (!booking) 
+      return res.status(404).json({ success: false, error: 'Booking not found' });
+    if (booking.user.toString() !== req.user.id) 
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    if (booking.status === 'cancelled') 
+      return res.status(400).json({ success: false, error: 'Already cancelled' });
 
-    // Check if user owns the booking
-    if (booking.user.toString() !== req.user.id) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-
-    // Refund tickets to event
+    // Refund tickets
     const event = await Event.findById(booking.event);
     event.ticketsAvailable += booking.tickets;
     await event.save();
 
-    // Update booking status
+    // Mark booking cancelled
     booking.status = 'cancelled';
     await booking.save();
 
-    res.status(200).json({ success: true, data: {} });
+    return res.status(200).json({ success: true, data: booking });
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+    console.error('cancelBooking error:', err);
+    return res.status(500).json({ success: false, error: 'Server error' });
   }
 };

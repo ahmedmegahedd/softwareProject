@@ -1,3 +1,4 @@
+// backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
 exports.authenticate = (req, res, next) => {
@@ -13,7 +14,20 @@ exports.authenticate = (req, res, next) => {
   }
 };
 
-exports.checkRole = (role) => (req, res, next) => {
-  if (req.user.role !== role) return res.status(403).json({ error: 'Access denied' });
+/**
+ * CheckRole middleware: `allowed` can be a single role string,
+ * or an array of role strings
+ */
+exports.checkRole = (allowed) => (req, res, next) => {
+  const userRole = req.user.role;
+  if (Array.isArray(allowed)) {
+    if (!allowed.includes(userRole)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+  } else {
+    if (userRole !== allowed) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+  }
   next();
 };
