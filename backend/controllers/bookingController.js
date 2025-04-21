@@ -7,9 +7,9 @@ exports.bookTickets = async (req, res) => {
   try {
     const { eventId, tickets } = req.body;
     const event = await Event.findById(eventId);
-    if (!event) 
+    if (!event)
       return res.status(404).json({ success: false, error: 'Event not found' });
-    if (event.ticketsAvailable < tickets) 
+    if (event.ticketsAvailable < tickets)
       return res.status(400).json({ success: false, error: 'Not enough tickets available' });
 
     // Deduct tickets and save
@@ -44,17 +44,22 @@ exports.getUserBookings = async (req, res) => {
   }
 };
 
-// 3. Get Booking by ID
+// 3. Get Booking by ID (Standard User only)
 exports.getBookingById = async (req, res) => {
   try {
     const booking = await Booking
       .findById(req.params.id)
       .populate('event');
-    if (!booking) 
-      return res.status(404).json({ success: false, error: 'Booking not found' });
-    if (booking.user.toString() !== req.user.id) 
-      return res.status(403).json({ success: false, error: 'Access denied' });
 
+    // Debug logs
+    console.log('🔑 req.user.id:',   req.user.id);
+    console.log('🛒 booking.user:', booking ? booking.user.toString() : null);
+
+    if (!booking)
+      return res.status(404).json({ success: false, error: 'Booking not found' });
+    if (booking.user.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
     return res.status(200).json({ success: true, data: booking });
   } catch (err) {
     console.error('getBookingById error:', err);
@@ -62,16 +67,17 @@ exports.getBookingById = async (req, res) => {
   }
 };
 
-// 4. Cancel (Delete) Booking
+// 4. Cancel Booking (Standard User only)
 exports.cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
-    if (!booking) 
+    if (!booking)
       return res.status(404).json({ success: false, error: 'Booking not found' });
-    if (booking.user.toString() !== req.user.id) 
+    if (booking.user.toString() !== req.user.id) {
       return res.status(403).json({ success: false, error: 'Access denied' });
-    if (booking.status === 'cancelled') 
-      return res.status(400).json({ success: false, error: 'Already cancelled' });
+    }
+    if (booking.status === 'cancelled')
+      return res.status(400).json({ success: false, error: 'Booking already cancelled' });
 
     // Refund tickets
     const event = await Event.findById(booking.event);
