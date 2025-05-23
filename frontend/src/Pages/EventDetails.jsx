@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import api from '../api';
+import Spinner from '../components/Spinner';
 
 export default function EventDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [qty, setQty] = useState(1);
   const [availability, setAvailability] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await api.get(`/api/v1/events/${id}`);
+    api.get(`/events/${id}`)
+      .then(({ data }) => {
         setEvent(data.data);
         setAvailability(data.data.ticketsAvailable);
-      } catch (err) {
-        toast.error('Could not load event');
-      }
-    })();
+      })
+      .catch(() => toast.error('Failed to load event'))
+      .finally(() => setLoading(false));
   }, [id]);
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   if (!event) {
     return <div className="flex-1 flex items-center justify-center">Loading...</div>;
@@ -29,12 +34,21 @@ export default function EventDetails() {
   const total = event.price * qty;
   const handleBook = async () => {
     try {
-      await api.post(`/api/v1/bookings`, { eventId: id, tickets: qty });
+      await api.post(`/bookings`, { eventId: id, tickets: qty });
       toast.success('Booking confirmed!');
       setAvailability(prev => prev - qty);
     } catch (err) {
       toast.error('Booking failed. Try again.');
     }
+  };
+
+  const handleRegister = () => {
+    api.post(`/events/${id}/register`)
+      .then(() => {
+        toast.success('Successfully registered for event');
+        navigate('/dashboard');
+      })
+      .catch(() => toast.error('Registration failed'));
   };
 
   return (

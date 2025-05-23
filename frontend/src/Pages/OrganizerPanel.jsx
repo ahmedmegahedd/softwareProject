@@ -21,7 +21,7 @@ export default function OrganizerPanel() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    api.get('/api/v1/users/events')
+    api.get('/users/events')
       .then(({ data }) => {
         setEvents(
           (data.data || []).map(e => ({
@@ -47,7 +47,7 @@ export default function OrganizerPanel() {
 
   const handleDelete = id => {
     if (!window.confirm('Delete this event?')) return;
-    api.delete(`/api/v1/events/${id}`)
+    api.delete(`/events/${id}`)
       .then(() => {
         setEvents(es => es.filter(e => e.id !== id));
         toast.success('Event deleted');
@@ -57,8 +57,8 @@ export default function OrganizerPanel() {
 
   const handleSave = formData => {
     const call = selectedEvent
-      ? api.patch(`/api/v1/events/${selectedEvent.id}`, formData)
-      : api.post('/api/v1/events', formData);
+      ? api.patch(`/events/${selectedEvent.id}`, formData)
+      : api.post('/events', formData);
 
     call
       .then(({ data }) => {

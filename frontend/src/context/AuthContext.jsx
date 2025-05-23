@@ -7,13 +7,14 @@ const AuthDispatchContext = createContext();
 
 const initialState = {
   user: null,
-  token: null,
+  token: localStorage.getItem('token'),
   loading: true,
 };
 
 function authReducer(state, action) {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
+      localStorage.setItem('token', action.payload.token);
       return {
         ...state,
         user: action.payload.user,
@@ -21,6 +22,7 @@ function authReducer(state, action) {
         loading: false,
       };
     case 'LOGOUT':
+      localStorage.removeItem('token');
       return { user: null, token: null, loading: false };
     case 'LOADED_USER':
       return {
@@ -28,6 +30,11 @@ function authReducer(state, action) {
         user: action.payload.user,
         token: action.payload.token,
         loading: false,
+      };
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: action.payload,
       };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -42,15 +49,22 @@ export function AuthProvider({ children }) {
     const loadUser = async () => {
       const token = localStorage.getItem('token');
       if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const { data } = await api.get('/auth/me');
+          const { data } = await api.get('/users/profile');
           dispatch({ type: 'LOADED_USER', payload: { user: data.user, token } });
         } catch (err) {
-          dispatch({ type: 'LOGOUT' });
+          console.error('Error loading user:', err);
+          // Only clear token if it's an authentication error
+          if (err.response?.status === 401) {
+            localStorage.removeItem('token');
+            dispatch({ type: 'LOGOUT' });
+          } else {
+            // For other errors, keep the token but set loading to false
+            dispatch({ type: 'SET_LOADING', payload: false });
+          }
         }
       } else {
-        dispatch({ type: 'LOGOUT' });
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
     loadUser();

@@ -11,7 +11,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/api/v1/events')
+    api.get('/events')
       .then(({ data }) => {
         setEvents((data.data || []).map(e => ({ ...e, id: e._id })));
       })

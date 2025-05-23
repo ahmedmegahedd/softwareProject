@@ -9,7 +9,7 @@ export default function AdminConsole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([api.get('/api/v1/events/all'), api.get('/api/v1/users')])
+    Promise.all([api.get('/events/all'), api.get('/users')])
       .then(([evtRes, usrRes]) => {
         setEvents((evtRes.data.data || []).map(e => ({ ...e, id: e._id })));
         setUsers((usrRes.data.data || []).map(u => ({ ...u, id: u._id })));
@@ -19,7 +19,7 @@ export default function AdminConsole() {
   }, []);
 
   const updateEventStatus = (id, status) => {
-    api.patch(`/api/v1/events/${id}`, { status })
+    api.patch(`/events/${id}`, { status })
       .then(({ data }) => {
         setEvents(es => es.map(e => e.id === id ? { ...data.data, id } : e));
         toast.success(`Event ${status}`);
@@ -28,7 +28,7 @@ export default function AdminConsole() {
   };
 
   const updateUserRole = (id, role) => {
-    api.patch(`/api/v1/users/${id}`, { role })
+    api.patch(`/users/${id}`, { role })
       .then(({ data }) => {
         setUsers(us => us.map(u => u.id === id ? { ...data.data, id } : u));
         toast.success('User role updated');
@@ -38,7 +38,7 @@ export default function AdminConsole() {
 
   const deleteUser = id => {
     if (!window.confirm('Delete this user?')) return;
-    api.delete(`/api/v1/users/${id}`)
+    api.delete(`/users/${id}`)
       .then(() => {
         setUsers(us => us.filter(u => u.id !== id));
         toast.success('User deleted');

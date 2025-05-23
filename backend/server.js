@@ -1,9 +1,9 @@
 // backend/server.js
 require('dotenv').config();
-require('dotenv').config();
 const express    = require('express');
 const mongoose   = require('mongoose');
 const cors       = require('cors');
+const connectDB  = require('./config/database');
 
 const authRoutes    = require('./routes/authRoutes');
 const userRoutes    = require('./routes/userRoutes');
@@ -11,7 +11,15 @@ const eventRoutes   = require('./routes/eventRoutes');    // ← make sure path 
 const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // ─── DEBUG: Verify that each import is actually an Express Router ─────────────────────
@@ -28,13 +36,7 @@ app.use('/api/v1/events',  eventRoutes);
 app.use('/api/v1/bookings',bookingRoutes);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log(`Connected to MongoDB: ${mongoose.connection.name}`))
-  .catch(err => console.error('MongoDB connection error:', err));
-
-mongoose.connection.on('connected',    () => console.log('Mongoose connected to DB'));
-mongoose.connection.on('error',        err => console.error('Mongoose error:', err));
-mongoose.connection.on('disconnected', () => console.log('Mongoose disconnected'));
+connectDB();
 
 // Central error handler
 app.use((err, req, res, next) => {

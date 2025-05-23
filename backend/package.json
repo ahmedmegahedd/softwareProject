@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node server.js",
-  "dev": "nodemon server.js"
-}
-,
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ahmedmegahedd/softwareProject.git"
@@ -19,16 +18,22 @@
   },
   "homepage": "https://github.com/ahmedmegahedd/softwareProject#readme",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.13.2"
+    "mongoose": "^8.13.2",
+    "nodemailer": "^7.0.3"
   },
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-react": "^7.37.5",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3"
   }
 }
