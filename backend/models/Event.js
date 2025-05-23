@@ -7,6 +7,7 @@ const EventSchema = new mongoose.Schema({
   location: { type: String, required: true },
   price: { type: Number, required: true },
   ticketsAvailable: { type: Number, required: true },
+  image: { type: String }, // <-- Added image field
   organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   status: { type: String, enum: ['approved', 'pending', 'declined'], default: 'pending' },
 }, { timestamps: true });

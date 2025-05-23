@@ -1,4 +1,3 @@
-// backend/controllers/userController.js
 const User    = require('../models/User');
 const Booking = require('../models/Booking');
 const Event   = require('../models/Event');
@@ -10,7 +9,6 @@ exports.getProfile = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     return res.status(200).json({ success: true, data: user });
   } catch (err) {
-    console.error('getProfile error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -19,7 +17,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const updates = { ...req.body };
-    delete updates.role; // prevent role changes here
+    delete updates.role;
     const user = await User.findByIdAndUpdate(
       req.user.id,
       updates,
@@ -27,7 +25,6 @@ exports.updateProfile = async (req, res) => {
     ).select('-password');
     return res.status(200).json({ success: true, data: user });
   } catch (err) {
-    console.error('updateProfile error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -38,7 +35,6 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find().select('-password');
     return res.status(200).json({ success: true, data: users });
   } catch (err) {
-    console.error('getAllUsers error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -50,7 +46,6 @@ exports.getUserById = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     return res.status(200).json({ success: true, data: user });
   } catch (err) {
-    console.error('getUserById error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -70,7 +65,6 @@ exports.updateUserRole = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     return res.status(200).json({ success: true, data: user });
   } catch (err) {
-    console.error('updateUserRole error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -82,7 +76,6 @@ exports.deleteUser = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     return res.status(200).json({ success: true, data: {} });
   } catch (err) {
-    console.error('deleteUser error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -93,18 +86,24 @@ exports.getUserBookings = async (req, res) => {
     const bookings = await Booking.find({ user: req.user.id }).populate('event');
     return res.status(200).json({ success: true, data: bookings });
   } catch (err) {
-    console.error('getUserBookings error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
 
-// 8. Organizer‑scoped: get current organizer’s own events
+// 8. Organizer‑scoped: get current organizer’s own events with ticketsSold
 exports.getUserEvents = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user.id });
-    return res.status(200).json({ success: true, data: events });
+    const eventsWithSold = await Promise.all(events.map(async event => {
+      const bookings = await Booking.find({ event: event._id, status: 'confirmed' });
+      const ticketsSold = bookings.reduce((sum, b) => sum + b.tickets, 0);
+      return {
+        ...event.toObject(),
+        ticketsSold,
+      };
+    }));
+    return res.status(200).json({ success: true, data: eventsWithSold });
   } catch (err) {
-    console.error('getUserEvents error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
@@ -113,18 +112,18 @@ exports.getUserEvents = async (req, res) => {
 exports.getUserEventsAnalytics = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user.id });
-    const analytics = events.map(event => {
-      const sold = event.ticketsAvailable - (event.ticketsRemaining ?? 0);
+    const analytics = await Promise.all(events.map(async event => {
+      const bookings = await Booking.find({ event: event._id, status: 'confirmed' });
+      const ticketsSold = bookings.reduce((sum, b) => sum + b.tickets, 0);
       return {
-        eventId:       event._id,
-        title:         event.title,
-        ticketsSold:   sold,
-        percentageSold: (sold / event.ticketsAvailable) * 100
+        eventId: event._id,
+        title: event.title,
+        ticketsSold,
+        percentageSold: (ticketsSold / event.ticketsAvailable) * 100,
       };
-    });
+    }));
     return res.status(200).json({ success: true, data: analytics });
   } catch (err) {
-    console.error('getUserEventsAnalytics error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };

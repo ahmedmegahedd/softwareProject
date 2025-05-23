@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
     }
     const user = await User.create({ name, email, password, role });
     const token = generateToken(user);
-    return res.status(201).json({ success: true, token });
+    return res.status(201).json({ success: true, token, user });
   } catch (err) {
     console.error('register error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
     const token = generateToken(user);
-    return res.status(200).json({ success: true, token });
+    return res.status(200).json({ success: true, token, user });
   } catch (err) {
     console.error('login error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });

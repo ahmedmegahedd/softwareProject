@@ -1,8 +1,48 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: sans-serif;
-  background-color: #f9f9f9;
+html, body, #root {
+  height: 100%;
 }
+/* Custom theme variables for use in plain CSS (not with @apply) */
+:root {
+  --color-primary: #FF5700;
+  --color-secondary: #1F2937;
+  --color-bg: #F9FAFB;
+  --color-accent-light: #FFEDD5;
+  --radius-lg: 1rem;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900 font-sans;
+  /* If you want to use your variables, do it in plain CSS: */
+  /* background: var(--color-bg); color: var(--color-secondary); */
+}
+
+/* Button styles */
+.btn {
+  @apply px-5 py-2 rounded-xl font-semibold transition-shadow;
+}
+.btn-primary {
+  @apply bg-orange-600 text-white hover:shadow-lg;
+}
+.btn-secondary {
+  @apply bg-white text-orange-600 border border-orange-600 hover:bg-orange-100;
+}
+
+/* Card component */
+.card {
+  @apply bg-white rounded-xl shadow-sm hover:shadow-lg transition;
+}
+
+/* Typography */
+.h1 { @apply text-4xl font-extrabold mb-4; }
+.h2 { @apply text-2xl font-semibold mb-3; }
+.p { @apply mb-2 leading-relaxed; }
+
+/* Utility classes */
+.flex-center { @apply flex items-center justify-center; }
+.mt-section { @apply mt-8; }
+.px-section { @apply px-4 md:px-8; }
