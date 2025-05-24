@@ -14,42 +14,42 @@ const {
   getUserEventsAnalytics
 } = require('../controllers/userController');
 
-const { authenticate, checkRole } = require('../middleware/auth');
+const { auth, checkRole } = require('../middleware/auth');
 
 // Profile routes (authenticated users)
 router.get(
   '/profile',
-  authenticate,
+  auth,
   getProfile
 );
 router.put(
   '/profile',
-  authenticate,
+  auth,
   updateProfile
 );
 
 // Admin user-management routes
 router.get(
   '/',
-  authenticate,
+  auth,
   checkRole('admin'),
   getAllUsers
 );
 router.get(
   '/:id',
-  authenticate,
+  auth,
   checkRole('admin'),
   getUserById
 );
 router.put(
   '/:id',
-  authenticate,
+  auth,
   checkRole('admin'),
   updateUserRole
 );
 router.delete(
   '/:id',
-  authenticate,
+  auth,
   checkRole('admin'),
   deleteUser
 );
@@ -57,21 +57,22 @@ router.delete(
 // User‑scoped bookings
 router.get(
   '/bookings',
-  authenticate,
+  auth,
   checkRole('user'),
   getUserBookings
 );
 
-// Organizer‑scoped events
+// Organizer‑scoped events (ONLY organizer, not admin)
+console.log('Registering /events route for organizers only');
 router.get(
   '/events',
-  authenticate,
+  auth,
   checkRole('organizer'),
   getUserEvents
 );
 router.get(
   '/events/analytics',
-  authenticate,
+  auth,
   checkRole('organizer'),
   getUserEventsAnalytics
 );

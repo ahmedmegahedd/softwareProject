@@ -21,19 +21,26 @@ export default function OrganizerPanel() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    api.get('/users/events')
-      .then(({ data }) => {
-        setEvents(
-          (data.data || []).map(e => ({
-            ...e,
-            id: e._id,
-            ticketsSold: e.ticketsSold ?? 0
-          }))
-        );
-      })
-      .catch(() => toast.error('Failed to load your events'))
-      .finally(() => setLoading(false));
+    fetchEvents();
   }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const { data } = await api.get('/users/events');
+      setEvents(
+        (data.data || []).map(e => ({
+          ...e,
+          id: e._id,
+          ticketsSold: e.ticketsSold ?? 0
+        }))
+      );
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      toast.error('Failed to load your events');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openCreate = () => {
     setSelectedEvent(null);
@@ -45,45 +52,80 @@ export default function OrganizerPanel() {
     setModalOpen(true);
   };
 
-  const handleDelete = id => {
+  const handleDelete = async id => {
     if (!window.confirm('Delete this event?')) return;
-    api.delete(`/events/${id}`)
-      .then(() => {
-        setEvents(es => es.filter(e => e.id !== id));
-        toast.success('Event deleted');
-      })
-      .catch(() => toast.error('Deletion failed'));
+    try {
+      await api.delete(`/events/${id}`);
+      setEvents(es => es.filter(e => e.id !== id));
+      toast.success('Event deleted');
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      toast.error('Deletion failed');
+    }
   };
 
-  const handleSave = formData => {
-    const call = selectedEvent
-      ? api.patch(`/events/${selectedEvent.id}`, formData)
-      : api.post('/events', formData);
-
-    call
-      .then(({ data }) => {
-        const ev = { ...data.data, id: data.data._id, ticketsSold: data.data.ticketsSold ?? 0 };
-        setEvents(es =>
-          selectedEvent ? es.map(e => (e.id === ev.id ? ev : e)) : [...es, ev]
-        );
-        toast.success(selectedEvent ? 'Event updated' : 'Event created');
-        setModalOpen(false);
-      })
-      .catch(() => toast.error('Save failed'));
+  const handleSave = async formData => {
+    try {
+      const call = selectedEvent
+        ? api.put(`/events/${selectedEvent.id}`, formData)
+        : api.post('/events', formData);
+      
+      const { data } = await call;
+      if (selectedEvent) {
+        setEvents(es => es.map(e => e.id === selectedEvent.id ? { ...data.data, id: data.data._id } : e));
+        toast.success('Event updated');
+      } else {
+        setEvents(es => [...es, { ...data.data, id: data.data._id }]);
+        toast.success('Event created');
+      }
+      setModalOpen(false);
+    } catch (err) {
+      console.error('Error saving event:', err);
+      toast.error(selectedEvent ? 'Update failed' : 'Creation failed');
+    }
   };
 
   if (loading) return <Spinner />;
 
   return (
-    <div className="flex-1 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="h1">Organizer Dashboard</h1>
-        <button onClick={openCreate} className="btn btn-primary">
-          + New Event
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Organizer Dashboard</h1>
+        <button
+          onClick={openCreate}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Create New Event
         </button>
       </div>
 
-      <MyEvents events={events} onEdit={openEdit} onDelete={handleDelete} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {events.map(event => (
+          <div key={event.id} className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-2">{event.title}</h2>
+            <p className="text-gray-600 mb-4">{event.description}</p>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">
+                {event.ticketsSold} / {event.ticketsAvailable} tickets sold
+              </span>
+              <div className="space-x-2">
+                <button
+                  onClick={() => openEdit(event)}
+                  className="text-blue-500 hover:text-blue-600"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <Modal
         isOpen={modalOpen}
@@ -91,8 +133,8 @@ export default function OrganizerPanel() {
         title={selectedEvent ? 'Edit Event' : 'Create Event'}
       >
         <EventForm
-          initialData={selectedEvent}
-          onSave={handleSave}
+          event={selectedEvent}
+          onSubmit={handleSave}
           onCancel={() => setModalOpen(false)}
         />
       </Modal>

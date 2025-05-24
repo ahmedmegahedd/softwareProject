@@ -34,11 +34,12 @@ export default function EventDetails() {
   const total = event.price * qty;
   const handleBook = async () => {
     try {
-      await api.post(`/bookings`, { eventId: id, tickets: qty });
+      await api.post(`/events/${id}/bookings`, { tickets: qty });
       toast.success('Booking confirmed!');
       setAvailability(prev => prev - qty);
     } catch (err) {
-      toast.error('Booking failed. Try again.');
+      console.error('Booking error:', err);
+      toast.error(err.response?.data?.error || 'Booking failed. Try again.');
     }
   };
 
@@ -52,31 +53,52 @@ export default function EventDetails() {
   };
 
   return (
-    <div className="flex-1 overflow-auto px-4 py-6">
-      <img
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="flex-1 overflow-auto px-4 py-6"
+    >
+      <motion.img
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
         src={event.image || '/placeholder.jpg'}
         alt={event.title}
         className="w-full h-64 object-cover rounded-2xl shadow"
       />
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Event Info */}
-        <div>
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           <h2 className="text-3xl font-bold">{event.title}</h2>
           <p className="text-gray-600 mt-2">{event.description}</p>
           <div className="mt-4 space-y-2">
-            <p><strong>Date:</strong> {event.date && event.date.substring(0, 10)}</p>
+            <p><strong>Date:</strong> {event.date && new Date(event.date).toLocaleDateString()}</p>
             <p><strong>Location:</strong> {event.location}</p>
             <p>
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+              <span className={`px-2 py-1 rounded-full ${
+                availability > 0 
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}>
                 {availability > 0 
                   ? `Only ${availability} left` 
                   : 'Sold Out'}
               </span>
             </p>
           </div>
-        </div>
+        </motion.div>
         {/* Booking Sidebar */}
-        <aside className="bg-white p-6 rounded-2xl shadow sticky top-24">
+        <motion.aside
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white p-6 rounded-2xl shadow sticky top-24"
+        >
           <div className="space-y-4">
             <div>
               <label htmlFor="qty" className="block text-sm font-medium">
@@ -98,14 +120,15 @@ export default function EventDetails() {
             <motion.button
               onClick={handleBook}
               whileHover={{ scale: 1.05 }}
-              className="w-full px-4 py-3 bg-[#FF5700] text-white rounded-full font-semibold"
+              whileTap={{ scale: 0.95 }}
+              className="w-full px-4 py-3 bg-[#FF5700] text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={availability === 0}
             >
               {availability === 0 ? 'Sold Out' : 'Book Now'}
             </motion.button>
           </div>
-        </aside>
+        </motion.aside>
       </div>
-    </div>
+    </motion.div>
   );
 }

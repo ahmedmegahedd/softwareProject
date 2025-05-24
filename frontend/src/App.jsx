@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { AnimatePresence } from 'framer-motion';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
-import { AnimatePresence } from 'framer-motion';
 
 import Navbar from './components/Navbar';
 import LoginForm from './components/LoginForm';
@@ -17,11 +17,14 @@ import EventDetails from './Pages/EventDetails';
 import UserDashboard from './Pages/UserDashboard';
 import OrganizerPanel from './Pages/OrganizerPanel';
 import AdminConsole from './Pages/AdminConsole';
+import MyEvents from './Pages/MyEvents';
+import EventForm from './Pages/EventForm';
+import EventAnalytics from './Pages/EventAnalytics';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
         <AnimatePresence mode="wait">
           <div className="min-h-screen flex flex-col">
             <Navbar />
@@ -41,7 +44,7 @@ function App() {
                 <Route
                   path="/dashboard/*"
                   element={
-                    <PrivateRoute>
+                    <PrivateRoute allowedRoles={['user', 'organizer', 'admin']}>
                       <UserDashboard />
                     </PrivateRoute>
                   }
@@ -51,7 +54,7 @@ function App() {
                 <Route
                   path="/organizer/*"
                   element={
-                    <PrivateRoute roleRequired="organizer">
+                    <PrivateRoute allowedRoles={['organizer']}>
                       <OrganizerPanel />
                     </PrivateRoute>
                   }
@@ -61,10 +64,44 @@ function App() {
                 <Route
                   path="/admin/*"
                   element={
-                    <PrivateRoute roleRequired="admin">
+                    <PrivateRoute allowedRoles={['admin']}>
                       <AdminConsole />
                     </PrivateRoute>
                   }
+                />
+
+                {/* Organizer Routes */}
+                <Route 
+                  path="/my-events" 
+                  element={
+                    <PrivateRoute allowedRoles={['organizer']}>
+                      <MyEvents />
+                    </PrivateRoute>
+                  } 
+                />
+                <Route 
+                  path="/my-events/new" 
+                  element={
+                    <PrivateRoute allowedRoles={['organizer']}>
+                      <EventForm />
+                    </PrivateRoute>
+                  } 
+                />
+                <Route 
+                  path="/my-events/:id/edit" 
+                  element={
+                    <PrivateRoute allowedRoles={['organizer']}>
+                      <EventForm />
+                    </PrivateRoute>
+                  } 
+                />
+                <Route 
+                  path="/my-events/analytics" 
+                  element={
+                    <PrivateRoute allowedRoles={['organizer']}>
+                      <EventAnalytics />
+                    </PrivateRoute>
+                  } 
                 />
 
                 {/* Fallback */}
@@ -74,8 +111,8 @@ function App() {
             <ToastContainer position="top-right" />
           </div>
         </AnimatePresence>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

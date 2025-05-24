@@ -61,8 +61,8 @@ exports.register = async (req, res) => {
 
     // Validate role
     const allowedRoles = ['user', 'organizer', 'admin'];
-    const normalizedRole = role ? role.toLowerCase() : undefined;
-    if (normalizedRole && !allowedRoles.includes(normalizedRole)) {
+    const normalizedRole = role ? role.toLowerCase() : 'user';
+    if (!allowedRoles.includes(normalizedRole)) {
       console.log('Invalid role:', role);
       return res.status(400).json({ 
         success: false, 
@@ -71,7 +71,12 @@ exports.register = async (req, res) => {
     }
 
     // Create new user
-    const user = await User.create({ name, email, password, role: normalizedRole });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      role: normalizedRole 
+    });
     console.log('User created successfully:', { id: user._id, email: user.email, role: user.role });
     
     const token = generateToken(user);

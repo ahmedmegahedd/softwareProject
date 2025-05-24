@@ -1,33 +1,55 @@
 // backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-exports.authenticate = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Access denied' });
+const auth = async (req, res, next) => {
+  let token;
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(400).json({ error: 'Invalid token' });
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = await User.findById(decoded.id).select('-password');
+      console.log("🔐 Token verified:", decoded);
+      console.log("👤 User attached to request:", req.user);
+
+      if (!req.user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+
+      next();
+    } catch (error) {
+      console.error("❌ Invalid token:", error.message);
+      return res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
-/**
- * CheckRole middleware: `allowed` can be a single role string,
- * or an array of role strings
- */
-exports.checkRole = (allowed) => (req, res, next) => {
-  const userRole = req.user.role;
+const checkRole = (allowed) => (req, res, next) => {
+  console.log('checkRole:', { allowed, userRole: req.user?.role, url: req.originalUrl }); // Debug log
+  if (!req.user || !req.user.role) {
+    return res.status(403).json({ error: 'Access denied - no role found' });
+  }
+  const userRole = req.user.role.toLowerCase();
   if (Array.isArray(allowed)) {
-    if (!allowed.includes(userRole)) {
-      return res.status(403).json({ error: 'Access denied' });
+    if (!allowed.map(r => r.toLowerCase()).includes(userRole)) {
+      return res.status(403).json({ error: 'Access denied - insufficient permissions' });
     }
   } else {
-    if (userRole !== allowed) {
-      return res.status(403).json({ error: 'Access denied' });
+    if (userRole !== allowed.toLowerCase()) {
+      return res.status(403).json({ error: 'Access denied - insufficient permissions' });
     }
   }
   next();
 };
+
+module.exports = { auth, checkRole };

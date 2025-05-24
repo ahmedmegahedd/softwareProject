@@ -9,27 +9,36 @@ const {
   updateEvent,
   deleteEvent,
   getEventAnalytics,
-  getAllEvents
+  getAllEvents,
+  getMyEvents
 } = require('../controllers/eventController');
 
-const { authenticate, checkRole } = require('../middleware/auth');
+const { auth, checkRole } = require('../middleware/auth');
 
 // Public: list only approved events
 router.get('/', getEvents);
 
-// Admin-only: list all events (any status)
+// Admin and Organizer: list all events (any status)
 router.get(
   '/all',
-  authenticate,
-  checkRole('admin'),
+  auth,
+  checkRole(['admin', 'organizer']),
   getAllEvents
 );
 
-// Organizer-only: analytics on their own events
+// Organizer: get their own events (alias for /me to match frontend)
+router.get(
+  '/me',
+  auth,
+  checkRole('organizer'),
+  getMyEvents
+);
+
+// Admin and Organizer: get event analytics
 router.get(
   '/analytics',
-  authenticate,
-  checkRole('organizer'),
+  auth,
+  checkRole(['admin', 'organizer']),
   getEventAnalytics
 );
 
@@ -39,7 +48,7 @@ router.get('/:id', getEvent);
 // Organizer-only: create a new event
 router.post(
   '/',
-  authenticate,
+  auth,
   checkRole('organizer'),
   createEvent
 );
@@ -47,16 +56,16 @@ router.post(
 // Organizer or Admin: update event
 router.put(
   '/:id',
-  authenticate,
+  auth,
   checkRole(['organizer', 'admin']),
   updateEvent
 );
 
-// Organizer-only: delete their own event
+// Organizer or Admin: delete event
 router.delete(
   '/:id',
-  authenticate,
-  checkRole('organizer'),
+  auth,
+  checkRole(['organizer', 'admin']),
   deleteEvent
 );
 

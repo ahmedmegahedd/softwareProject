@@ -22,6 +22,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const { data } = await api.post('/login', form);
+      localStorage.setItem('token', data.token);
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.user, token: data.token } });
       toast.success('Login successful!');
       navigate('/');

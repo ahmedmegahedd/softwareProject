@@ -9,12 +9,12 @@ const {
   cancelBooking
 } = require('../controllers/bookingController');
 
-const { authenticate, checkRole } = require('../middleware/auth');
+const { auth, checkRole } = require('../middleware/auth');
 
 // 1. Book tickets (standard user)
 router.post(
-  '/',
-  authenticate,
+  '/:eventId',
+  auth,
   checkRole('user'),
   bookTickets
 );
@@ -22,7 +22,7 @@ router.post(
 // 2. List current user's bookings
 router.get(
   '/',
-  authenticate,
+  auth,
   checkRole('user'),
   getUserBookings
 );
@@ -30,7 +30,7 @@ router.get(
 // 3. Get a specific booking
 router.get(
   '/:id',
-  authenticate,
+  auth,
   checkRole('user'),
   getBookingById
 );
@@ -38,7 +38,7 @@ router.get(
 // 4. Cancel a booking
 router.delete(
   '/:id',
-  authenticate,
+  auth,
   checkRole('user'),
   cancelBooking
 );
