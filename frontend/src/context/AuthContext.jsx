@@ -15,8 +15,8 @@ const initialState = {
 function authReducer(state, action) {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
+      console.log('[Auth] LOGIN_SUCCESS:', { user: action.payload.user, token: '***' });
       localStorage.setItem('token', action.payload.token);
-      console.log('[AuthContext] LOGIN_SUCCESS', action.payload);
       return {
         ...state,
         user: action.payload.user,
@@ -24,11 +24,12 @@ function authReducer(state, action) {
         loading: false,
       };
     case 'LOGOUT':
+      console.log('[Auth] LOGOUT');
       localStorage.removeItem('token');
-      console.log('[AuthContext] LOGOUT');
       return { user: null, token: null, loading: false };
     case 'LOADED_USER':
-      console.log('[AuthContext] LOADED_USER', action.payload);
+      console.log('[Auth] LOADED_USER:', { user: action.payload.user });
+      localStorage.setItem('token', action.payload.token);
       return {
         ...state,
         user: action.payload.user,
@@ -36,7 +37,9 @@ function authReducer(state, action) {
         loading: false,
       };
     case 'SET_LOADING':
-      console.log('[AuthContext] SET_LOADING', action.payload);
+      if (action.payload === false) {
+        console.log('[Auth] Loading complete');
+      }
       return {
         ...state,
         loading: action.payload,
@@ -49,6 +52,15 @@ function authReducer(state, action) {
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log(`[Auth] Token found at ${location.pathname}:`, token.slice(0, 12) + '...');
+    } else {
+      console.log(`[Auth] No token found at ${location.pathname}`);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const loadUser = async () => {

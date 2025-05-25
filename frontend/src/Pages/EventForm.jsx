@@ -10,6 +10,16 @@ export default function EventForm() {
   const { user, loading: authLoading } = useAuthState();
   const isEditing = Boolean(id);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log(`[EventForm] Token found at mount:`, token.slice(0, 12) + '...');
+    } else {
+      console.log('[EventForm] No token found at mount');
+    }
+    console.log(`[EventForm] Mounted with ID: ${id}, isEditing: ${isEditing}`);
+  }, [id, isEditing]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -46,10 +56,12 @@ export default function EventForm() {
 
   const fetchEvent = async () => {
     try {
+      console.log('[EventForm] Fetching event with ID:', id);
       setLoading(true);
       setNotFound(false);
       setUnauthorized(false);
       const response = await getEvent(id);
+      console.log('[EventForm] Event fetch response:', response.data);
       const event = response.data.data;
       setFormData({
         title: event.title,
@@ -65,6 +77,7 @@ export default function EventForm() {
         setImagePreview(event.image);
       }
     } catch (err) {
+      console.error('[EventForm] Error fetching event:', err);
       if (err.response?.status === 404) setNotFound(true);
       else if (err.response?.status === 401) setUnauthorized(true);
       else setError('Failed to fetch event details');
@@ -145,7 +158,13 @@ export default function EventForm() {
       setError(null);
       const eventData = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) eventData.append(key, value);
+        if (value !== null && value !== undefined) {
+          if (key === 'image' && value instanceof File) {
+            eventData.append('image', value);
+          } else {
+            eventData.append(key, value);
+          }
+        }
       });
       if (isEditing) {
         console.log('[EventForm] Updating event:', id, formData);

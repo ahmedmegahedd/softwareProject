@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
+// Always use the provided Atlas connection string
+const MONGODB_URI = 'mongodb+srv://loaimohamedfarrag:Mongo%40SW25@cluster0.lymhh.mongodb.net/Software?retryWrites=true&w=majority';
+
 const connectDB = async () => {
     try {
-        // Use local MongoDB connection
-        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/event_management';
-        
         const conn = await mongoose.connect(MONGODB_URI);
         console.log('✅ MongoDB Connected...');
     } catch (error) {

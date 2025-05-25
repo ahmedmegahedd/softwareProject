@@ -42,9 +42,6 @@ router.get(
   getEventAnalytics
 );
 
-// Public: get one event by ID (only approved)
-router.get('/:id', getEvent);
-
 // Organizer-only: create a new event
 router.post(
   '/',
@@ -52,6 +49,9 @@ router.post(
   checkRole('organizer'),
   createEvent
 );
+
+// Get single event (with auth for non-public events)
+router.get('/:id', auth, getEvent);
 
 // Organizer or Admin: update event
 router.put(
@@ -65,7 +65,7 @@ router.put(
 router.delete(
   '/:id',
   auth,
-  checkRole(['organizer', 'admin']),
+  checkRole(['organizer', 'organizer']),
   deleteEvent
 );
 

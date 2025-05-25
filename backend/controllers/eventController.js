@@ -49,18 +49,32 @@ exports.getEvent = async (req, res) => {
     console.log('[Backend] Fetching event', req.params.id, 'for user', req.user?.id, 'role', req.user?.role);
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'name email');
+    
     if (!event) {
       console.log('[Backend] Event not found', req.params.id);
-      throw new NotFoundError('Event not found');
+      return res.status(404).json({
+        success: false,
+        error: 'Event not found'
+      });
     }
+
+    // Check authorization
     if (event.status !== 'approved' && req.user?.role !== 'admin' && event.organizer.toString() !== req.user?.id) {
       console.log('[Backend] Not authorized to view event', req.params.id, 'user', req.user?.id, 'organizer', event.organizer.toString());
-      throw new UnauthorizedError('Not authorized to view this event');
+      return res.status(401).json({
+        success: false,
+        error: 'Not authorized to view this event'
+      });
     }
-    res.json({ success: true, data: event });
+
+    console.log('[Backend] Sending event data:', event);
+    return res.status(200).json({
+      success: true,
+      data: event
+    });
   } catch (error) {
     console.error('[Backend] Get event error:', error);
-    res.status(error.statusCode || 500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
       error: error.message
     });

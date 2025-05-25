@@ -46,7 +46,19 @@ export const getProfile = () => api.get('/users/profile');
 
 // Event endpoints
 export const getEvents = () => api.get('/events');
-export const getEvent = (id) => api.get(`/events/${id}`);
+export const getEvent = (id) => {
+  console.log('[API] Fetching event with ID:', id);
+  return api.get(`/events/${id}`).then(response => {
+    console.log('[API] Event fetch response:', response);
+    if (!response.data || !response.data.data) {
+      throw new Error('Invalid response format');
+    }
+    return response;
+  }).catch(error => {
+    console.error('[API] Error fetching event:', error);
+    throw error;
+  });
+};
 export const createEvent = (data) => api.post('/events', data);
 export const updateEvent = (id, data) => api.put(`/events/${id}`, data);
 export const deleteEvent = (id) => api.delete(`/events/${id}`);

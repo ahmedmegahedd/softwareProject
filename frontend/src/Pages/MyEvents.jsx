@@ -151,7 +151,10 @@ export default function MyEvents() {
               </div>
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => navigate(`/my-events/${event._id}/edit`)}
+                  onClick={() => {
+                    console.log('[MyEvents] Edit clicked for event:', event._id);
+                    navigate(`/my-events/${event._id}/edit`);
+                  }}
                   className="px-3 py-1 text-orange-600 hover:text-orange-700"
                 >
                   Edit

@@ -25,7 +25,7 @@ export default function LoginForm() {
       localStorage.setItem('token', data.token);
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: data.user, token: data.token } });
       toast.success('Login successful!');
-      navigate('/');
+      window.location.href = '/my-events';
     } catch (err) {
       const errorMsg = err.response?.data?.error || 'Login failed. Please check your credentials.';
       setError(errorMsg);

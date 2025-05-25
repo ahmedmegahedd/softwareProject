@@ -67,15 +67,15 @@ export default function OrganizerPanel() {
   const handleSave = async formData => {
     try {
       const call = selectedEvent
-        ? api.put(`/events/${selectedEvent.id}`, formData)
+        ? api.put(`/events/${selectedEvent._id}`, formData)
         : api.post('/events', formData);
       
       const { data } = await call;
       if (selectedEvent) {
-        setEvents(es => es.map(e => e.id === selectedEvent.id ? { ...data.data, id: data.data._id } : e));
+        setEvents(es => es.map(e => e._id === selectedEvent._id ? { ...data.data, _id: data.data._id } : e));
         toast.success('Event updated');
       } else {
-        setEvents(es => [...es, { ...data.data, id: data.data._id }]);
+        setEvents(es => [...es, { ...data.data, _id: data.data._id }]);
         toast.success('Event created');
       }
       setModalOpen(false);
@@ -101,7 +101,7 @@ export default function OrganizerPanel() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map(event => (
-          <div key={event.id} className="bg-white rounded-lg shadow p-6">
+          <div key={event._id} className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-2">{event.title}</h2>
             <p className="text-gray-600 mb-4">{event.description}</p>
             <div className="flex justify-between items-center">
@@ -116,7 +116,7 @@ export default function OrganizerPanel() {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(event.id)}
+                  onClick={() => handleDelete(event._id)}
                   className="text-red-500 hover:text-red-600"
                 >
                   Delete
