@@ -31,7 +31,7 @@ api.interceptors.response.use(
     console.log('Response error:', error.response?.status, error.response?.data); // Debug log
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }

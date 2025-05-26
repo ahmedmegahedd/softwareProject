@@ -58,8 +58,10 @@ exports.getEvent = async (req, res) => {
       });
     }
 
+
     // Check authorization
-    if (event.status !== 'approved' && req.user?.role !== 'admin' && event.organizer.toString() !== req.user?.id) {
+    if ( req.user?.role !== 'admin' && event.organizer.toString() !== req.user.id.toString()) {
+      console.log('hiiiiiiiiiiiiiiiiiiii1')
       console.log('[Backend] Not authorized to view event', req.params.id, 'user', req.user?.id, 'organizer', event.organizer.toString());
       return res.status(401).json({
         success: false,
@@ -102,12 +104,14 @@ exports.updateEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) {
       console.log('Update: Event not found', req.params.id);
-      throw new NotFoundError('Event not found');
+      return res.status(404).json({ success: false, error: 'Event not found' });
     }
-    // Check if user is authorized to update
-    if (req.user.role !== 'admin' && event.organizer.toString() !== req.user.id) {
+    // Only admin or the event's organizer can update
+    const isAdmin = req.user.role === 'admin';
+    const isOrganizer = event.organizer.toString() === req.user.id.toString();
+    if (!isAdmin && !isOrganizer) {
       console.log('Update: Not authorized', req.user.id, event.organizer.toString());
-      throw new UnauthorizedError('Not authorized to update this event');
+      return res.status(401).json({ success: false, error: 'Not authorized to update this event' });
     }
     // If organizer is updating, set status back to pending
     if (req.user.role === 'organizer') {
