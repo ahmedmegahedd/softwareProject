@@ -16,9 +16,9 @@ export default function SearchBar({ placeholder, onSearch, inputClassName = '' }
 
   return (
     <div className="flex-center my-4 w-full">
-      <div className="card flex items-center w-full max-w-lg px-4 py-2">
+      <div className="card flex items-center w-full max-w-lg px-4 py-2 bg-neutral-800 border border-neutral-600 rounded-lg">
         <svg
-          className="w-6 h-6 text-secondary mr-3"
+          className="w-6 h-6 text-gray-300 mr-3"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -36,11 +36,11 @@ export default function SearchBar({ placeholder, onSearch, inputClassName = '' }
           value={value}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
-          className={`flex-1 bg-transparent outline-none ${inputClassName}`}
+          className={`flex-1 bg-transparent outline-none text-[#f0f0f0] placeholder-gray-400 text-lg ${inputClassName}`}
         />
         <button
           onClick={handleButton}
-          className="ml-2 px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 transition"
+          className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
         >
           Search
         </button>
