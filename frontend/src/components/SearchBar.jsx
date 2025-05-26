@@ -1,9 +1,21 @@
 // src/components/SearchBar.jsx
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function SearchBar({ placeholder, onSearch }) {
+export default function SearchBar({ placeholder, onSearch, inputClassName = '' }) {
+  const [value, setValue] = useState('');
+
+  const handleInput = (e) => setValue(e.target.value);
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && onSearch) {
+      onSearch(value.trim());
+    }
+  };
+  const handleButton = () => {
+    if (onSearch) onSearch(value.trim());
+  };
+
   return (
-    <div className="flex-center my-4">
+    <div className="flex-center my-4 w-full">
       <div className="card flex items-center w-full max-w-lg px-4 py-2">
         <svg
           className="w-6 h-6 text-secondary mr-3"
@@ -21,10 +33,18 @@ export default function SearchBar({ placeholder, onSearch }) {
         <input
           type="text"
           placeholder={placeholder}
-          onKeyDown={e => e.key === 'Enter' && onSearch && onSearch(e.target.value)}
-          className="flex-1 bg-transparent outline-none text-secondary"
+          value={value}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          className={`flex-1 bg-transparent outline-none ${inputClassName}`}
         />
+        <button
+          onClick={handleButton}
+          className="ml-2 px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 transition"
+        >
+          Search
+        </button>
       </div>
     </div>
-);
+  );
 }

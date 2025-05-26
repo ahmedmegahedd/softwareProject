@@ -1,24 +1,26 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthState, useAuthDispatch } from '../context/AuthContext';
+import api from '../api';
 
 export default function Navbar() {
   const { user } = useAuthState();
   const dispatch = useAuthDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await api.post('/logout');
     dispatch({ type: 'LOGOUT' });
     navigate('/login');
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-background shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-blue-600">Eventify</span>
+              <span className="text-2xl font-bold text-primary">Ehgez Hafla</span>
             </Link>
           </div>
 
@@ -27,7 +29,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Login
                 </Link>
@@ -72,7 +74,7 @@ export default function Navbar() {
                 )}
                 <Link
                   to="/profile"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Profile
                 </Link>

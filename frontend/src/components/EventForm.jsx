@@ -29,7 +29,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         placeholder="Title"
         value={form.title}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
         required
       />
       <input
@@ -37,7 +37,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         type="date"
         value={form.date}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
         required
       />
       <input
@@ -46,7 +46,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         placeholder="Location"
         value={form.location}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
       <input
         name="ticketsAvailable"
@@ -54,7 +54,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         placeholder="Tickets Available"
         value={form.ticketsAvailable}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
       <input
         name="price"
@@ -62,14 +62,14 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         placeholder="Price"
         value={form.price}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
       <textarea
         name="description"
         placeholder="Description"
         value={form.description}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
       <input
         name="image"
@@ -77,7 +77,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         placeholder="Image URL"
         value={form.image}
         onChange={handleChange}
-        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
+        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
       />
       <div className="flex justify-end space-x-2">
         <button
@@ -89,7 +89,7 @@ export default function EventForm({ initialData = {}, onSave, onCancel }) {
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-[#FF5700] text-white rounded-full hover:scale-105 transition"
+          className="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition"
         >
           Save
         </button>

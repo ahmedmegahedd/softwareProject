@@ -56,14 +56,14 @@ export default function EventAnalytics() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+      <h1 className="text-3xl font-bold text-white mb-6">
         {user.role === 'admin' ? 'All Events Analytics' : 'My Events Analytics'}
       </h1>
 
@@ -79,18 +79,18 @@ export default function EventAnalytics() {
           const status = event?.status || 'pending';
 
           return (
-            <div key={event?.id || Math.random()} className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">{event?.title || 'Untitled Event'}</h2>
+            <div key={event?.id || Math.random()} className="bg-neutral-900 rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">{event?.title || 'Untitled Event'}</h2>
               
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">Booking Progress</span>
-                    <span className="text-sm font-medium text-gray-700">{bookingPercentage}%</span>
+                    <span className="text-sm font-medium text-gray-300">Booking Progress</span>
+                    <span className="text-sm font-medium text-gray-300">{bookingPercentage}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div
-                      className="bg-orange-500 h-2.5 rounded-full"
+                      className="bg-primary h-2.5 rounded-full"
                       style={{ width: `${bookingPercentage}%` }}
                     ></div>
                   </div>
@@ -98,30 +98,30 @@ export default function EventAnalytics() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-500">Total Tickets</p>
-                    <p className="text-lg font-semibold">{event?.totalTickets || 0}</p>
+                    <p className="text-sm text-gray-400">Total Tickets</p>
+                    <p className="text-lg font-semibold text-white">{event?.totalTickets || 0}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-500">Booked Tickets</p>
-                    <p className="text-lg font-semibold">{event?.ticketsSold || 0}</p>
+                    <p className="text-sm text-gray-400">Booked Tickets</p>
+                    <p className="text-lg font-semibold text-white">{event?.ticketsSold || 0}</p>
                   </div>
                 </div>
 
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Available Tickets</p>
-                  <p className="text-lg font-semibold">{event?.ticketsAvailable || 0}</p>
+                  <p className="text-sm text-gray-400">Available Tickets</p>
+                  <p className="text-lg font-semibold text-white">{event?.ticketsAvailable || 0}</p>
                 </div>
 
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Status</p>
-                  <p className={`text-lg font-semibold ${getStatusColor(status)}`}>
+                  <p className="text-sm text-gray-400">Status</p>
+                  <p className={`text-lg font-semibold text-white ${getStatusColor(status)}`}>
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </p>
                 </div>
 
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-500">Total Revenue</p>
-                  <p className="text-lg font-semibold">${(event?.revenue || 0).toFixed(2)}</p>
+                  <p className="text-sm text-gray-400">Total Revenue</p>
+                  <p className="text-lg font-semibold text-white">${(event?.revenue || 0).toFixed(2)}</p>
                 </div>
               </div>
             </div>

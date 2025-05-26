@@ -8,33 +8,30 @@ const AuthDispatchContext = createContext();
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('token'),
   loading: true,
+  error: null
 };
 
 function authReducer(state, action) {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
-      console.log('[Auth] LOGIN_SUCCESS:', { user: action.payload.user, token: '***' });
-      localStorage.setItem('token', action.payload.token);
+      console.log('[Auth] LOGIN_SUCCESS:', { user: action.payload.user });
       return {
         ...state,
         user: action.payload.user,
-        token: action.payload.token,
         loading: false,
+        error: null
       };
     case 'LOGOUT':
       console.log('[Auth] LOGOUT');
-      localStorage.removeItem('token');
-      return { user: null, token: null, loading: false };
+      return { user: null, loading: false, error: null };
     case 'LOADED_USER':
       console.log('[Auth] LOADED_USER:', { user: action.payload.user });
-      localStorage.setItem('token', action.payload.token);
       return {
         ...state,
         user: action.payload.user,
-        token: action.payload.token,
         loading: false,
+        error: null
       };
     case 'SET_LOADING':
       if (action.payload === false) {
@@ -43,6 +40,14 @@ function authReducer(state, action) {
       return {
         ...state,
         loading: action.payload,
+        error: null
+      };
+    case 'SET_ERROR':
+      console.error('[Auth] Error:', action.payload);
+      return {
+        ...state,
+        error: action.payload,
+        loading: false
       };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -54,40 +59,38 @@ export function AuthProvider({ children }) {
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      console.log(`[Auth] Token found at ${location.pathname}:`, token.slice(0, 12) + '...');
-    } else {
-      console.log(`[Auth] No token found at ${location.pathname}`);
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
     const loadUser = async () => {
-      const token = localStorage.getItem('token');
-      console.log('[AuthContext] Token on mount/location:', token, 'at', location.pathname);
-      if (token) {
-        try {
-          const { data } = await api.get('/users/profile');
-          const user = {
-            ...data.data,
-            role: data.data.role || 'user'
-          };
-          console.log('[AuthContext] User loaded:', user);
-          dispatch({ type: 'LOADED_USER', payload: { user, token } });
-        } catch (err) {
-          console.error('[AuthContext] Error loading user:', err);
-          if (err.response?.status === 401) {
-            localStorage.removeItem('token');
-            console.log('[AuthContext] Logging out due to 401');
-            dispatch({ type: 'LOGOUT' });
-          } else {
-            dispatch({ type: 'SET_LOADING', payload: false });
-          }
+      try {
+        console.log('[AuthContext] Attempting to load user profile...');
+        const { data } = await api.get('/users/profile');
+        console.log('[AuthContext] Profile response:', data);
+        
+        if (!data.data) {
+          throw new Error('Invalid response format from server');
         }
-      } else {
-        console.log('[AuthContext] No token found, set loading to false');
-        dispatch({ type: 'SET_LOADING', payload: false });
+
+        const user = {
+          ...data.data,
+          role: data.data.role || 'user'
+        };
+        console.log('[AuthContext] User loaded successfully:', user);
+        dispatch({ type: 'LOADED_USER', payload: { user } });
+      } catch (err) {
+        console.error('[AuthContext] Error loading user:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message
+        });
+        
+        if (err.response?.status === 401) {
+          console.log('[AuthContext] Unauthorized, logging out...');
+          dispatch({ type: 'LOGOUT' });
+        } else {
+          dispatch({ 
+            type: 'SET_ERROR', 
+            payload: err.response?.data?.message || err.message || 'Failed to load user profile'
+          });
+        }
       }
     };
     loadUser();

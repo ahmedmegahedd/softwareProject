@@ -20,6 +20,7 @@ import AdminConsole from './Pages/AdminConsole';
 import MyEvents from './Pages/MyEvents';
 import EventForm from './Pages/EventForm';
 import EventAnalytics from './Pages/EventAnalytics';
+import Profile from './Pages/Profile';
 
 function App() {
   return (
@@ -102,6 +103,16 @@ function App() {
                       <EventAnalytics />
                     </PrivateRoute>
                   } 
+                />
+
+                {/* Profile route */}
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute allowedRoles={['user', 'organizer', 'admin']}>
+                      <Profile />
+                    </PrivateRoute>
+                  }
                 />
 
                 {/* Fallback */}

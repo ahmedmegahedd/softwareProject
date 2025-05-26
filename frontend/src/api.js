@@ -10,75 +10,80 @@ const api = axios.create({
   }
 });
 
-// Add request interceptor to include auth token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-    console.log('Request headers:', config.headers); // Debug log
-  } else {
-    console.log('No token found in localStorage'); // Debug log
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
-
-// Add response interceptor to handle token expiration
-api.interceptors.response.use(
-  (response) => response,
+// Request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log('[API Request]', {
+      url: config.url,
+      method: config.method,
+      headers: config.headers,
+      withCredentials: config.withCredentials
+    });
+    return config;
+  },
   (error) => {
-    console.log('Response error:', error.response?.status, error.response?.data); // Debug log
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      // window.location.href = '/login';
-    }
+    console.error('[API Request Error]', error);
     return Promise.reject(error);
   }
 );
+
+// Response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log('[API Response]', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
+  (error) => {
+    console.error('[API Response Error]', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
+
+// No request interceptor for Authorization header needed
+// No response interceptor for token expiration needed
 
 // Auth endpoints
 export const login = (credentials) => api.post('/login', credentials);
 export const register = (userData) => api.post('/register', userData);
 export const forgotPassword = (email) => api.put('/forgetPassword', { email });
 export const resetPassword = (data) => api.put('/resetPassword', data);
-export const getProfile = () => api.get('/users/profile');
 
 // Event endpoints
 export const getEvents = () => api.get('/events');
-export const getEvent = (id) => {
-  console.log('[API] Fetching event with ID:', id);
-  return api.get(`/events/${id}`).then(response => {
-    console.log('[API] Event fetch response:', response);
-    if (!response.data || !response.data.data) {
-      throw new Error('Invalid response format');
-    }
-    return response;
-  }).catch(error => {
-    console.error('[API] Error fetching event:', error);
-    throw error;
-  });
-};
-export const createEvent = (data) => api.post('/events', data);
-export const updateEvent = (id, data) => api.put(`/events/${id}`, data);
+export const getEvent = (id) => api.get(`/events/${id}`);
+export const createEvent = (eventData) => api.post('/events', eventData);
+export const updateEvent = (id, eventData) => api.put(`/events/${id}`, eventData);
 export const deleteEvent = (id) => api.delete(`/events/${id}`);
-export const getMyEvents = () => api.get('/events/me');
+export const getMyEvents = () => api.get('/events/my');
 export const getEventAnalytics = () => api.get('/users/events/analytics');
+export const getApprovedEvents = (search = '') => {
+  let url = '/events?status=approved';
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+  return api.get(url);
+};
 
 // Booking endpoints
-export const createBooking = (eventId, bookingData) => api.post(`/events/${eventId}/bookings`, bookingData);
-export const getMyBookings = () => api.get('/users/bookings');
-export const cancelBooking = (bookingId) => api.put(`/bookings/${bookingId}/cancel`);
+export const bookEvent = (id, bookingData) => api.post(`/events/${id}/bookings`, bookingData);
+export const getBookings = () => api.get('/bookings');
+export const cancelBooking = (id) => api.delete(`/bookings/${id}`);
 
 // User management endpoints
 export const updateProfile = (userData) => api.put('/users/profile', userData);
 export const changePassword = (passwordData) => api.put('/users/change-password', passwordData);
-
-// Admin endpoints
 export const getAllUsers = () => api.get('/users');
-export const updateUserRole = (id, role) => api.put(`/users/${id}`, { role });
+export const getUserById = (id) => api.get(`/users/${id}`);
+export const updateUserRole = (id, role) => api.patch(`/users/${id}`, { role });
 export const deleteUser = (id) => api.delete(`/users/${id}`);
-export const getAllEvents = () => api.get('/events/all');
-export const updateEventStatus = (id, status) => api.put(`/events/${id}`, { status });
 
 export default api;

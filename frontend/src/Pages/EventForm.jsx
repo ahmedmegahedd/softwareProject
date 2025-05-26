@@ -11,12 +11,6 @@ export default function EventForm() {
   const isEditing = Boolean(id);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      console.log(`[EventForm] Token found at mount:`, token.slice(0, 12) + '...');
-    } else {
-      console.log('[EventForm] No token found at mount');
-    }
     console.log(`[EventForm] Mounted with ID: ${id}, isEditing: ${isEditing}`);
   }, [id, isEditing]);
 
@@ -187,7 +181,7 @@ export default function EventForm() {
   if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -202,8 +196,8 @@ export default function EventForm() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+      <div className="max-w-2xl mx-auto bg-neutral-900 rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-white mb-6">
           {isEditing ? 'Edit Event' : 'Create New Event'}
         </h1>
 
@@ -215,7 +209,7 @@ export default function EventForm() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-300">
               Title *
             </label>
             <input
@@ -226,12 +220,12 @@ export default function EventForm() {
               onChange={handleChange}
               required
               minLength={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-300">
               Description *
             </label>
             <textarea
@@ -242,12 +236,12 @@ export default function EventForm() {
               required
               minLength={10}
               rows={4}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="date" className="block text-sm font-medium text-gray-300">
               Date *
             </label>
             <input
@@ -258,12 +252,12 @@ export default function EventForm() {
               onChange={handleChange}
               required
               min={new Date().toISOString().split('T')[0]}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="location" className="block text-sm font-medium text-gray-300">
               Location *
             </label>
             <input
@@ -273,12 +267,12 @@ export default function EventForm() {
               value={formData.location}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="price" className="block text-sm font-medium text-gray-300">
               Price (USD) *
             </label>
             <input
@@ -290,12 +284,12 @@ export default function EventForm() {
               required
               min="0"
               step="0.01"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="ticketsAvailable" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="ticketsAvailable" className="block text-sm font-medium text-gray-300">
               Number of Tickets *
             </label>
             <input
@@ -306,12 +300,12 @@ export default function EventForm() {
               onChange={handleChange}
               required
               min="1"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-300">
               Category
             </label>
             <select
@@ -319,7 +313,7 @@ export default function EventForm() {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             >
               <option value="concert">Concert</option>
               <option value="conference">Conference</option>
@@ -330,7 +324,7 @@ export default function EventForm() {
           </div>
 
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="image" className="block text-sm font-medium text-gray-300">
               Event Image
             </label>
             <input
@@ -363,7 +357,7 @@ export default function EventForm() {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
             >
               {loading ? 'Saving...' : isEditing ? 'Update Event' : 'Create Event'}
             </button>

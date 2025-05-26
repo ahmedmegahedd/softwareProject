@@ -49,8 +49,7 @@ export default function RegisterForm() {
         dispatch({ 
           type: 'LOGIN_SUCCESS', 
           payload: { 
-            user: loginResponse.data.user, 
-            token: loginResponse.data.token 
+            user: loginResponse.data.user
           } 
         });
         

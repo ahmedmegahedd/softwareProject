@@ -7,15 +7,16 @@ html, body, #root {
 }
 /* Custom theme variables for use in plain CSS (not with @apply) */
 :root {
-  --color-primary: #FF5700;
+  --color-primary: #1E90FF;
+  --color-bg: #000000;
+  --color-text: #FFFFFF;
   --color-secondary: #1F2937;
-  --color-bg: #F9FAFB;
-  --color-accent-light: #FFEDD5;
+  --color-accent-light: #1E90FF22;
   --radius-lg: 1rem;
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 font-sans antialiased;
+  @apply bg-background text-text font-sans antialiased;
   /* If you want to use your variables, do it in plain CSS: */
   /* background: var(--color-bg); color: var(--color-secondary); */
 }
