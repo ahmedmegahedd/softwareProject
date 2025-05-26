@@ -26,13 +26,13 @@ router.get(
   getAllEvents
 );
 
-// Organizer: get their own events (alias for /me to match frontend)
-router.get(
-  '/me',
-  auth,
-  checkRole('organizer'),
-  getMyEvents
-);
+// --- CRITICAL: Register /my and /me BEFORE /:id to avoid ObjectId cast errors ---
+router.route('/me')
+  .get(auth, checkRole('organizer'), getMyEvents);
+
+router.route('/my')
+  .get(auth, checkRole('organizer'), getMyEvents);
+// -----------------------------------------------------------------------------
 
 // Admin and Organizer: get event analytics
 router.get(
@@ -50,24 +50,11 @@ router.post(
   createEvent
 );
 
-// Get single event (with auth for non-public events)
-router.get('/:id', auth, getEvent);
-
-// Organizer or Admin: update event
-router.put(
-  '/:id',
-  auth,
-  checkRole(['organizer', 'admin']),
-  updateEvent
-);
-
-// Organizer or Admin: delete event
-router.delete(
-  '/:id',
-  auth,
-  checkRole(['organizer', 'organizer']),
-  deleteEvent
-);
+// NOTE: This must come AFTER /my and /me
+router.route('/:id')
+  .get(auth, getEvent)
+  .put(auth, checkRole(['organizer', 'admin']), updateEvent)
+  .delete(auth, checkRole(['organizer', 'admin']), deleteEvent);
 
 // Export the router function
 module.exports = router;

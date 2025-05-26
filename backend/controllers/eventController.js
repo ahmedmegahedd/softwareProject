@@ -35,18 +35,60 @@ exports.getAllEvents = async (req, res) => {
 // Get organizer's events
 exports.getMyEvents = async (req, res) => {
   try {
+    console.log('[EventController] Getting events for organizer:', {
+      userId: req.user.id,
+      role: req.user.role
+    });
+
+    if (!req.user || !req.user.id) {
+      console.error('[EventController] No user found in request');
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
     const events = await Event.find({ organizer: req.user.id })
-      .sort({ date: 1 });
-    res.json({ success: true, data: events });
+      .sort({ date: 1 })
+      .populate('organizer', 'name email');
+
+    console.log('[EventController] Found events:', {
+      count: events.length,
+      events: events.map(e => ({
+        id: e._id,
+        title: e.title,
+        status: e.status
+      }))
+    });
+
+    res.json({ 
+      success: true, 
+      data: events 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[EventController] Error in getMyEvents:', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?.id
+    });
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch events' 
+    });
   }
 };
 
 // Get single event
 exports.getEvent = async (req, res) => {
   try {
-    console.log('[Backend] Fetching event', req.params.id, 'for user', req.user?.id, 'role', req.user?.role);
+    // Defensive: prevent ObjectId cast error if /my or /me is routed here
+    if (req.params.id === 'my' || req.params.id === 'me') {
+      return res.status(404).json({
+        success: false,
+        error: 'Event not found'
+      });
+    }
+    console.log('[Backend] Fetching event', req.params.id, 'for user', req.user);
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'name email');
     
@@ -58,14 +100,17 @@ exports.getEvent = async (req, res) => {
       });
     }
 
+    // Log organizer and user for debugging
+    console.log('[Backend] Event organizer:', event.organizer?._id || event.organizer, 'Request user:', req.user?._id, req.user?.id, 'Role:', req.user?.role);
 
-    // Check authorization
-    if ( req.user?.role !== 'admin' && event.organizer.toString() !== req.user.id.toString()) {
-      console.log('hiiiiiiiiiiiiiiiiiiii1')
-      console.log('[Backend] Not authorized to view event', req.params.id, 'user', req.user?.id, 'organizer', event.organizer.toString());
-      return res.status(401).json({
+    // Only admin or the event's organizer can view
+    const isAdmin = req.user?.role === 'admin';
+    const isOrganizer = event.organizer?._id?.toString() === req.user?._id?.toString() || event.organizer?.toString() === req.user?._id?.toString();
+    if (!isAdmin && !isOrganizer) {
+      console.log('[Backend] Not authorized to view event', req.params.id, 'user', req.user?._id, 'organizer', event.organizer?._id || event.organizer);
+      return res.status(403).json({
         success: false,
-        error: 'Not authorized to view this event'
+        error: 'You are not authorized to view this event.'
       });
     }
 

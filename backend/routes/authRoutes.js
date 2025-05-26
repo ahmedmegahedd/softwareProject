@@ -13,5 +13,6 @@ router.post('/register', register);
 router.post('/login',    login);
 router.put('/forgetPassword', forgetPassword);
 router.put('/resetPassword', resetPassword);
+router.post('/logout', require('../controllers/authController').logout);
 
 module.exports = router;

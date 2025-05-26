@@ -10,20 +10,34 @@ const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '3h' }
+    { expiresIn: '24h' } // Increased to 24 hours
   );
+};
+
+// Helper to set auth cookie
+const setAuthCookie = (res, token) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    path: '/'
+  };
+
+  console.log('[Auth] Setting cookie with options:', cookieOptions);
+  res.cookie('token', token, cookieOptions);
 };
 
 // Register endpoint
 exports.register = async (req, res) => {
   try {
-    console.log('Registration attempt:', { ...req.body, password: '***' });
+    console.log('[Auth] Registration attempt:', { ...req.body, password: '***' });
     
     const { name, email, password, role } = req.body;
     
     // Validate required fields
     if (!name || !email || !password) {
-      console.log('Missing required fields:', { name: !!name, email: !!email, password: !!password });
+      console.log('[Auth] Missing required fields:', { name: !!name, email: !!email, password: !!password });
       return res.status(400).json({ 
         success: false, 
         error: 'Missing required fields. Please provide name, email, and password.' 
@@ -33,7 +47,7 @@ exports.register = async (req, res) => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.log('Invalid email format:', email);
+      console.log('[Auth] Invalid email format:', email);
       return res.status(400).json({ 
         success: false, 
         error: 'Invalid email format. Please provide a valid email address.' 
@@ -42,7 +56,7 @@ exports.register = async (req, res) => {
 
     // Validate password length
     if (password.length < 6) {
-      console.log('Password too short');
+      console.log('[Auth] Password too short');
       return res.status(400).json({ 
         success: false, 
         error: 'Password must be at least 6 characters long.' 
@@ -52,7 +66,7 @@ exports.register = async (req, res) => {
     // Check if user already exists
     const existing = await User.findOne({ email });
     if (existing) {
-      console.log('Email already in use:', email);
+      console.log('[Auth] Email already in use:', email);
       return res.status(400).json({ 
         success: false, 
         error: 'Email already in use. Please use a different email address.' 
@@ -63,7 +77,7 @@ exports.register = async (req, res) => {
     const allowedRoles = ['user', 'organizer', 'admin'];
     const normalizedRole = role ? role.toLowerCase() : 'user';
     if (!allowedRoles.includes(normalizedRole)) {
-      console.log('Invalid role:', role);
+      console.log('[Auth] Invalid role:', role);
       return res.status(400).json({ 
         success: false, 
         error: 'Invalid role. Must be either "user", "organizer", or "admin".' 
@@ -77,12 +91,14 @@ exports.register = async (req, res) => {
       password, 
       role: normalizedRole 
     });
-    console.log('User created successfully:', { id: user._id, email: user.email, role: user.role });
+    console.log('[Auth] User created successfully:', { id: user._id, email: user.email, role: user.role });
     
+    // Generate token and set cookie
     const token = generateToken(user);
+    setAuthCookie(res, token);
+
     return res.status(201).json({ 
       success: true, 
-      token, 
       user: {
         id: user._id,
         name: user.name,
@@ -91,7 +107,7 @@ exports.register = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Registration error:', err);
+    console.error('[Auth] Registration error:', err);
     return res.status(500).json({ 
       success: false, 
       error: 'Server error during registration. Please try again.' 
@@ -102,54 +118,86 @@ exports.register = async (req, res) => {
 // Login endpoint
 exports.login = async (req, res) => {
   try {
-    console.log('Login attempt:', { email: req.body.email });
+    console.log('\n[Auth] Login attempt:', { email: req.body.email });
     
     const { email, password } = req.body;
     if (!email || !password) {
-      console.log('Missing credentials');
+      console.log('[Auth] Missing credentials');
       return res.status(400).json({ 
         success: false, 
-        error: 'Email and password are required.' 
+        message: 'Email and password are required.' 
       });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found:', email);
+      console.log('[Auth] User not found:', email);
       return res.status(404).json({ 
         success: false, 
-        error: 'User not found. Please check your email or register.' 
+        message: 'User not found. Please check your email or register.' 
       });
     }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      console.log('Invalid password for user:', email);
+      console.log('[Auth] Invalid password for user:', email);
       return res.status(401).json({ 
         success: false, 
-        error: 'Invalid password. Please try again.' 
+        message: 'Invalid password. Please try again.' 
       });
     }
 
-    console.log('Login successful:', { id: user._id, email: user.email, role: user.role });
+    // Generate token
     const token = generateToken(user);
+    console.log('[Auth] Token generated for user:', { 
+      id: user._id, 
+      email: user.email 
+    });
+
+    // Set cookie
+    setAuthCookie(res, token);
+    console.log('[Auth] Cookie set successfully');
+
+    // Send response
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
+    console.log('[Auth] Login successful:', userResponse);
     return res.status(200).json({ 
       success: true, 
-      token, 
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user: userResponse
     });
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('[Auth] Login error:', err);
     return res.status(500).json({ 
       success: false, 
-      error: 'Server error during login. Please try again.' 
+      message: 'Server error during login. Please try again.' 
     });
   }
+};
+
+// Logout endpoint
+exports.logout = (req, res) => {
+  console.log('\n[Auth] Logout request');
+  
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Lax',
+    path: '/'
+  };
+
+  console.log('[Auth] Clearing cookie with options:', cookieOptions);
+  res.clearCookie('token', cookieOptions);
+  
+  return res.status(200).json({ 
+    success: true, 
+    message: 'Logged out successfully' 
+  });
 };
 
 // Password reset endpoint (send OTP)
