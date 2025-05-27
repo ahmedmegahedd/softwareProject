@@ -1,9 +1,13 @@
 import React from 'react';
+import Lottie from 'lottie-react';
+import loadingAnimation from '../assets/lottie/loading.json';
 
 export default function Spinner() {
   return (
     <div className="flex-center flex-1">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-16 h-16">
+        <Lottie animationData={loadingAnimation} loop autoplay style={{ width: '100%', height: '100%' }} />
+      </div>
     </div>
   );
 }

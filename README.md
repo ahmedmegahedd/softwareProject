@@ -1,7 +1,7 @@
-# 🎫 Ehgez Hafla – Online Event Ticketing System
+# 🎫 Tickify – Online Event Ticketing System
 
 ## 📌 Overview
-**Ehgez Hafla** is a full-stack MERN web application \ It enables users to browse, create, and book tickets for various events including concerts, sports, and theater shows.
+**Tickify** is a full-stack MERN web application. It enables users to browse, create, and book tickets for various events including concerts, sports, and theater shows. The UI features a modern orange and white theme for a vibrant, clean, and accessible experience.
 
 ---
 
@@ -46,6 +46,34 @@
 | Database      | MongoDB (Mongoose)                 |
 | Authentication| JWT + HttpOnly Cookies + Bcrypt    |
 | DevOps        | GitHub, Vercel/Netlify             |
+
+---
+
+## 🛠 Environment Variables
+
+### Backend (.env)
+- `MONGODB_URI` – MongoDB connection string
+- `JWT_SECRET` – Secret for JWT signing
+- `EMAIL_USER` – Email address for sending OTPs (Gmail recommended)
+- `EMAIL_PASS` – App password for the email account
+- `NODE_ENV` – `development` or `production`
+- `FRONTEND_URL` – (optional) Allowed CORS origin, e.g. `http://localhost:3000`
+
+### Frontend
+- No required `.env` variables by default. If you add API proxying or custom endpoints, document them here.
+
+---
+
+## 🎨 Dark/Light Mode Theming
+
+- The app uses a custom CSS variable system for dark/light mode, toggled via the button in the navbar.
+- The current theme is stored in `localStorage` and applied via a `[data-theme]` attribute on `<html>`.
+- All color classes (e.g., `bg-background`, `text-text`) are mapped to CSS variables, so the theme updates instantly.
+- **No Tailwind `dark:` utilities are used.**
+- To add new theme colors, edit `:root` and `[data-theme='dark']` in `src/index.css`.
+- If the theme toggle does not work, ensure you are not using Tailwind `dark:` classes and that React versions are consistent.
+
+---
 
 
 

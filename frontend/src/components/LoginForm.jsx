@@ -40,24 +40,34 @@ export default function LoginForm() {
         <h2 className="h2 text-center">Login</h2>
         {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+          <div>
+            <label htmlFor="email" className="form-label">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="form-input"
+              autoComplete="email"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="form-label">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="form-input"
+              autoComplete="current-password"
+            />
+          </div>
           <button type="submit" className="btn btn-primary w-full" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>

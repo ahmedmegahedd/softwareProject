@@ -65,7 +65,7 @@ export default function EventDetails() {
         transition={{ duration: 0.3 }}
         src={event.image || '/placeholder.jpg'}
         alt={event.title}
-        className="w-full h-64 object-cover rounded-2xl shadow"
+        className="w-full h-64 object-cover rounded-2xl shadow bg-primary/10"
       />
       <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Event Info */}
@@ -74,16 +74,16 @@ export default function EventDetails() {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-3xl font-bold">{event.title}</h2>
-          <p className="text-gray-600 mt-2">{event.description}</p>
+          <h2 className="h1">{typeof event.title === 'string' ? event.title : String(event.title)}</h2>
+          <p className="p mt-2">{typeof event.description === 'string' ? event.description : String(event.description)}</p>
           <div className="mt-4 space-y-2">
-            <p><strong>Date:</strong> {event.date && new Date(event.date).toLocaleDateString()}</p>
-            <p><strong>Location:</strong> {event.location}</p>
+            <p><strong>Date:</strong> {event.date && (typeof event.date === 'string' || typeof event.date === 'number' ? new Date(event.date).toLocaleDateString() : String(event.date))}</p>
+            <p><strong>Location:</strong> {typeof event.location === 'string' ? event.location : String(event.location)}</p>
             <p>
-              <span className={`px-2 py-1 rounded-full ${
+              <span className={`px-2 py-1 rounded-full text-sm font-semibold shadow-sm ${
                 availability > 0 
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+                  ? 'bg-primary/10 text-primary' 
+                  : 'bg-deep/10 text-deep'
               }`}>
                 {availability > 0 
                   ? `Only ${availability} left` 
@@ -97,13 +97,11 @@ export default function EventDetails() {
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-white p-6 rounded-2xl shadow sticky top-24"
+          className="card p-6 rounded-2xl shadow sticky top-24 bg-white"
         >
           <div className="space-y-4">
             <div>
-              <label htmlFor="qty" className="block text-sm font-medium">
-                Quantity
-              </label>
+              <label htmlFor="qty" className="form-label">Quantity</label>
               <input
                 type="number"
                 id="qty"
@@ -111,17 +109,17 @@ export default function EventDetails() {
                 max={availability}
                 value={qty}
                 onChange={e => setQty(Math.min(Math.max(1, Number(e.target.value)), availability))}
-                className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="form-input"
               />
             </div>
             <div>
-              <p className="text-xl font-bold">Total: ${total}</p>
+              <p className="text-xl font-bold text-primary">Total: ${total}</p>
             </div>
             <motion.button
               onClick={handleBook}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full px-4 py-3 bg-[#FF5700] text-white rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={availability === 0}
             >
               {availability === 0 ? 'Sold Out' : 'Book Now'}

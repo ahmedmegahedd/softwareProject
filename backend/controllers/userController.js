@@ -2,7 +2,7 @@ const User    = require('../models/User');
 const Booking = require('../models/Booking');
 const Event   = require('../models/Event');
 
-// 1. Get current user’s profile
+// 1. Get current user's profile
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -13,7 +13,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// 2. Update current user’s profile
+// 2. Update current user's profile
 exports.updateProfile = async (req, res) => {
   try {
     const updates = { ...req.body };
@@ -50,9 +50,12 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// 5. Admin: update a user’s role
+// 5. Admin: update a user's role
 exports.updateUserRole = async (req, res) => {
   try {
+    if (req.method !== 'PATCH') {
+      return res.status(405).json({ success: false, error: 'Method Not Allowed. Use PATCH.' });
+    }
     const { role } = req.body;
     if (!['user','organizer','admin'].includes(role)) {
       return res.status(400).json({ success: false, error: 'Invalid role' });
@@ -80,7 +83,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// 7. User‑scoped: get current user’s bookings
+// 7. User‑scoped: get current user's bookings
 exports.getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id }).populate('event');
@@ -90,7 +93,7 @@ exports.getUserBookings = async (req, res) => {
   }
 };
 
-// 8. Organizer‑scoped: get current organizer’s own events with ticketsSold
+// 8. Organizer‑scoped: get current organizer's own events with ticketsSold
 exports.getUserEvents = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user.id });
@@ -108,7 +111,7 @@ exports.getUserEvents = async (req, res) => {
   }
 };
 
-// 9. Organizer‑scoped: get analytics for current organizer’s events
+// 9. Organizer‑scoped: get analytics for current organizer's events
 exports.getUserEventsAnalytics = async (req, res) => {
   try {
     const events = await Event.find({ organizer: req.user.id });

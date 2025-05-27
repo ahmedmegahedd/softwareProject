@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import { forgotPassword, resetPassword } from '../api';
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1);
@@ -22,7 +22,7 @@ export default function ForgotPassword() {
     setMessage('');
     setLoading(true);
     try {
-      const { data } = await api.put('/forgetPassword', { email: form.email });
+      const { data } = await forgotPassword(form.email);
       setMessage(data.message || 'OTP sent to your email.');
       setStep(2);
     } catch (err) {
@@ -43,7 +43,7 @@ export default function ForgotPassword() {
     }
     setLoading(true);
     try {
-      const { data } = await api.put('/resetPassword', {
+      const { data } = await resetPassword({
         email: form.email,
         otp: form.otp,
         newPassword: form.newPassword
@@ -67,48 +67,68 @@ export default function ForgotPassword() {
         {message && <p className="text-green-600 text-sm text-center mb-4">{message}</p>}
         {step === 1 ? (
           <form onSubmit={handleSendOTP} className="space-y-4">
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+            <div>
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                className="form-input"
+                autoComplete="email"
+              />
+            </div>
             <button type="submit" className="btn btn-primary w-full" disabled={loading}>
               {loading ? 'Sending OTP...' : 'Send OTP'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
-            <input
-              name="otp"
-              type="text"
-              placeholder="Enter OTP"
-              value={form.otp}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <input
-              name="newPassword"
-              type="password"
-              placeholder="New Password"
-              value={form.newPassword}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <input
-              name="confirmPassword"
-              type="password"
-              placeholder="Confirm New Password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+            <div>
+              <label htmlFor="otp" className="form-label">OTP</label>
+              <input
+                id="otp"
+                name="otp"
+                type="text"
+                placeholder="Enter OTP"
+                value={form.otp}
+                onChange={handleChange}
+                required
+                className="form-input"
+                autoComplete="one-time-code"
+              />
+            </div>
+            <div>
+              <label htmlFor="newPassword" className="form-label">New Password</label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                placeholder="New Password"
+                value={form.newPassword}
+                onChange={handleChange}
+                required
+                className="form-input"
+                autoComplete="new-password"
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm New Password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                required
+                className="form-input"
+                autoComplete="new-password"
+              />
+            </div>
             <button type="submit" className="btn btn-primary w-full" disabled={loading}>
               {loading ? 'Resetting...' : 'Reset Password'}
             </button>

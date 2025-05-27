@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function EventCard({ event, horizontal = false }) {
   const formatDate = (date) => {
@@ -13,37 +14,45 @@ export default function EventCard({ event, horizontal = false }) {
   };
 
   return (
-    <Link
-      to={`/events/${event.id || event._id}`}
-      className={`block bg-neutral-900 rounded-lg shadow-md overflow-hidden transition-transform hover:shadow-lg ${
-        horizontal ? 'flex items-center' : ''
-      }`}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(59,130,246,0.12)' }}
+      transition={{ duration: 0.3 }}
+      className="card block overflow-hidden p-0 transition-transform duration-200 hover:scale-105 hover:shadow-lg"
+      style={{ minHeight: horizontal ? '8rem' : undefined }}
     >
-      <img
-        src={event.image || '/placeholder.jpg'}
-        alt={event.title}
-        className={`${horizontal ? 'w-32 h-32' : 'w-full h-48'} object-cover`}
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = '/placeholder.jpg';
-        }}
-      />
-      <div className={`p-4 ${horizontal ? 'flex-1' : ''}`}>
-        <h3 className="text-lg font-semibold text-white mb-2">{event.title}</h3>
-        <p className="text-sm text-gray-300 mb-2">
-          {formatDate(event.date)} • {event.location || 'Location TBA'}
-        </p>
-        <div className="flex justify-between items-center">
-          <p className="font-bold text-primary">{formatPrice(event.price)}</p>
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            event.status === 'approved' ? 'bg-green-100 text-green-800' :
-            event.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-            'bg-red-100 text-red-800'
-          }`}>
-            {event.status || 'pending'}
-          </span>
+      <Link
+        to={`/events/${event.id || event._id}`}
+        aria-label={`View details for event: ${event.title}`}
+        tabIndex={0}
+      >
+        <img
+          src={event.image && event.image.trim() ? event.image : '/default-event.jpg'}
+          alt={event.title || 'Event image'}
+          className={`${horizontal ? 'w-32 h-32' : 'w-full h-48'} object-cover rounded-t-lg ${horizontal ? 'rounded-l-lg rounded-tr-none' : ''}`}
+          onError={e => {
+            e.target.onerror = null;
+            e.target.src = '/default-event.jpg';
+          }}
+        />
+        <div className={`p-6 flex flex-col justify-between ${horizontal ? 'flex-1' : ''}`}>
+          <div>
+            <h3 className="card-title mb-2 truncate text-text">{typeof event.title === 'string' ? event.title : String(event.title)}</h3>
+            <p className="card-meta mb-2 text-textSecondary">{formatDate(event.date)} • {typeof event.location === 'string' ? event.location : String(event.location) || 'Location TBA'}</p>
+          </div>
+          <div className="flex justify-between items-end mt-4">
+            <p className="text-lg font-extrabold text-primary">{formatPrice(event.price)}</p>
+            <span className={`badge ${
+              event.status === 'approved' ? 'badge-success' :
+              event.status === 'pending' ? 'badge-warning' :
+              'badge-error'
+            }`}>
+              {typeof event.status === 'string' ? event.status : String(event.status) || 'pending'}
+            </span>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }

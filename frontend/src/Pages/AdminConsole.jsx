@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
+import { updateEventStatus, updateUserRole } from '../api';
 
 export default function AdminConsole() {
   const [events, setEvents] = useState([]);
@@ -18,8 +19,8 @@ export default function AdminConsole() {
       .finally(() => setLoading(false));
   }, []);
 
-  const updateEventStatus = (id, status) => {
-    api.patch(`/events/${id}`, { status })
+  const updateEventStatusHandler = (id, status) => {
+    updateEventStatus(id, status)
       .then(({ data }) => {
         setEvents(es => es.map(e => e.id === id ? { ...data.data, id } : e));
         toast.success(`Event ${status}`);
@@ -27,8 +28,8 @@ export default function AdminConsole() {
       .catch(() => toast.error('Update failed'));
   };
 
-  const updateUserRole = (id, role) => {
-    api.patch(`/users/${id}`, { role })
+  const updateUserRoleHandler = (id, role) => {
+    updateUserRole(id, role)
       .then(({ data }) => {
         setUsers(us => us.map(u => u.id === id ? { ...data.data, id } : u));
         toast.success('User role updated');
@@ -55,27 +56,30 @@ export default function AdminConsole() {
       <section className="mb-8">
         <h2 className="h2 mb-4">Manage Events</h2>
         <div className="card overflow-auto">
-          <table className="min-w-full">
+          <table className="min-w-full rounded-xl overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3">Title</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">Actions</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Title</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Status</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {events.map(e => (
-                <tr key={e.id} className="border-t">
-                  <td className="px-6 py-4">{e.title}</td>
-                  <td className="px-6 py-4 capitalize">{e.status}</td>
+              {events.map((e, idx) => (
+                <tr
+                  key={e.id}
+                  className={`border-t ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-primary/10 transition`}
+                >
+                  <td className="px-6 py-4">{typeof e.title === 'string' ? e.title : String(e.title)}</td>
+                  <td className="px-6 py-4 capitalize">{typeof e.status === 'string' ? e.status : String(e.status)}</td>
                   <td className="px-6 py-4 space-x-4">
                     {e.status !== 'approved' && (
-                      <button onClick={() => updateEventStatus(e.id, 'approved')} className="btn btn-secondary">
+                      <button onClick={() => updateEventStatusHandler(e.id, 'approved')} className="btn btn-secondary">
                         Approve
                       </button>
                     )}
                     {e.status !== 'declined' && (
-                      <button onClick={() => updateEventStatus(e.id, 'declined')} className="btn btn-secondary">
+                      <button onClick={() => updateEventStatusHandler(e.id, 'declined')} className="btn btn-secondary">
                         Reject
                       </button>
                     )}
@@ -90,24 +94,27 @@ export default function AdminConsole() {
       <section>
         <h2 className="h2 mb-4">Manage Users</h2>
         <div className="card overflow-auto">
-          <table className="min-w-full">
+          <table className="min-w-full rounded-xl overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Actions</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Name</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Email</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Role</th>
+                <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map(u => (
-                <tr key={u.id} className="border-t">
-                  <td className="px-6 py-4">{u.name}</td>
-                  <td className="px-6 py-4">{u.email}</td>
+              {users.map((u, idx) => (
+                <tr
+                  key={u.id}
+                  className={`border-t ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-primary/10 transition`}
+                >
+                  <td className="px-6 py-4">{typeof u.name === 'string' ? u.name : String(u.name)}</td>
+                  <td className="px-6 py-4">{typeof u.email === 'string' ? u.email : String(u.email)}</td>
                   <td className="px-6 py-4">
                     <select
                       value={u.role}
-                      onChange={e => updateUserRole(u.id, e.target.value)}
+                      onChange={e => updateUserRoleHandler(u.id, e.target.value)}
                       className="border rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="user">User</option>

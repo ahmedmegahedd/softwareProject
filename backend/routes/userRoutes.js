@@ -41,7 +41,7 @@ router.get(
   checkRole('admin'),
   getUserById
 );
-router.put(
+router.patch(
   '/:id',
   auth,
   checkRole('admin'),

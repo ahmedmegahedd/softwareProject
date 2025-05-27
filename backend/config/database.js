@@ -3,10 +3,13 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // Always use the provided Atlas connection string
-const MONGODB_URI = 'mongodb+srv://loaimohamedfarrag:Mongo%40SW25@cluster0.lymhh.mongodb.net/Software?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
     try {
+        if (!MONGODB_URI) {
+            throw new Error('MONGODB_URI environment variable not set');
+        }
         const conn = await mongoose.connect(MONGODB_URI);
         console.log('✅ MongoDB Connected...');
     } catch (error) {

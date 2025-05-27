@@ -88,40 +88,40 @@ exports.getEvent = async (req, res) => {
         error: 'Event not found'
       });
     }
-    console.log('[Backend] Fetching event', req.params.id, 'for user', req.user);
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'name email');
     
     if (!event) {
-      console.log('[Backend] Event not found', req.params.id);
       return res.status(404).json({
         success: false,
         error: 'Event not found'
       });
     }
 
-    // Log organizer and user for debugging
-    console.log('[Backend] Event organizer:', event.organizer?._id || event.organizer, 'Request user:', req.user?._id, req.user?.id, 'Role:', req.user?.role);
+    // Allow public access if event is approved
+    if (event.status === 'approved') {
+      return res.status(200).json({
+        success: true,
+        data: event
+      });
+    }
 
-    // Only admin or the event's organizer can view
+    // Otherwise, only admin or the event's organizer can view
     const isAdmin = req.user?.role === 'admin';
     const isOrganizer = event.organizer?._id?.toString() === req.user?._id?.toString() || event.organizer?.toString() === req.user?._id?.toString();
     if (!isAdmin && !isOrganizer) {
-      console.log('[Backend] Not authorized to view event', req.params.id, 'user', req.user?._id, 'organizer', event.organizer?._id || event.organizer);
       return res.status(403).json({
         success: false,
         error: 'You are not authorized to view this event.'
       });
     }
 
-    console.log('[Backend] Sending event data:', event);
     return res.status(200).json({
       success: true,
       data: event
     });
   } catch (error) {
-    console.error('[Backend] Get event error:', error);
-    return res.status(error.statusCode || 500).json({
+    return res.status(500).json({
       success: false,
       error: error.message
     });
@@ -183,12 +183,12 @@ exports.deleteEvent = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) {
       console.log('Delete: Event not found', req.params.id);
-      throw new NotFoundError('Event not found');
+      return res.status(404).json({ success: false, error: 'Event not found' });
     }
     // Check if user is authorized to delete
     if (req.user.role !== 'admin' && event.organizer.toString() !== req.user.id) {
       console.log('Delete: Not authorized', req.user.id, event.organizer.toString());
-      throw new UnauthorizedError('Not authorized to delete this event');
+      return res.status(403).json({ success: false, error: 'Not authorized to delete this event' });
     }
     await Event.findByIdAndDelete(req.params.id);
     res.json({ success: true, data: {} });

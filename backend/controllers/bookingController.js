@@ -52,8 +52,7 @@ exports.bookTickets = async (req, res) => {
 
     return res.status(201).json({ 
       success: true, 
-      data: booking,
-      message: 'Booking confirmed successfully'
+      data: booking
     });
   } catch (err) {
     console.error('bookTickets error:', err);
@@ -155,8 +154,7 @@ exports.cancelBooking = async (req, res) => {
 
     return res.status(200).json({ 
       success: true, 
-      data: booking,
-      message: 'Booking cancelled successfully'
+      data: booking
     });
   } catch (err) {
     console.error('cancelBooking error:', err);

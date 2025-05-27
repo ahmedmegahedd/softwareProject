@@ -125,7 +125,7 @@ exports.login = async (req, res) => {
       console.log('[Auth] Missing credentials');
       return res.status(400).json({ 
         success: false, 
-        message: 'Email and password are required.' 
+        error: 'Email and password are required.' 
       });
     }
 
@@ -134,7 +134,7 @@ exports.login = async (req, res) => {
       console.log('[Auth] User not found:', email);
       return res.status(404).json({ 
         success: false, 
-        message: 'User not found. Please check your email or register.' 
+        error: 'User not found. Please check your email or register.' 
       });
     }
 
@@ -143,7 +143,7 @@ exports.login = async (req, res) => {
       console.log('[Auth] Invalid password for user:', email);
       return res.status(401).json({ 
         success: false, 
-        message: 'Invalid password. Please try again.' 
+        error: 'Invalid password. Please try again.' 
       });
     }
 
@@ -175,7 +175,7 @@ exports.login = async (req, res) => {
     console.error('[Auth] Login error:', err);
     return res.status(500).json({ 
       success: false, 
-      message: 'Server error during login. Please try again.' 
+      error: 'Server error during login. Please try again.' 
     });
   }
 };
@@ -220,8 +220,8 @@ exports.forgetPassword = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: "loai.mohamed.farrag@gmail.com",
-        pass: "boyimormqogoepab"
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
     });
     await transporter.sendMail({

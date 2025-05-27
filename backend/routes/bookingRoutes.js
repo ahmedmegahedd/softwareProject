@@ -19,6 +19,31 @@ router.post(
   bookTickets
 );
 
+// RESTful: Book tickets for an event (preferred RESTful style)
+router.post(
+  '/events/:eventId/bookings',
+  auth,
+  checkRole('user'),
+  (req, res, next) => {
+    req.params.eventId = req.params.eventId;
+    bookTickets(req, res, next);
+  }
+);
+
+// Backward compatibility: Book tickets with eventId in body
+router.post(
+  '/',
+  auth,
+  checkRole('user'),
+  (req, res, next) => {
+    if (!req.body.eventId) {
+      return res.status(400).json({ success: false, error: 'eventId is required in body' });
+    }
+    req.params.eventId = req.body.eventId;
+    bookTickets(req, res, next);
+  }
+);
+
 // 2. List current user's bookings
 router.get(
   '/',

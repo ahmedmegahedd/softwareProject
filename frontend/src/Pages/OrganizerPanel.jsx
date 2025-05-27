@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import api from '../api';
+import api, { createEvent, updateEvent, updateEventStatus } from '../api';
 import Spinner from '../components/Spinner';
 import MyEvents from './MyEvents';
 import Modal from '../components/Modal';
@@ -67,9 +67,8 @@ export default function OrganizerPanel() {
   const handleSave = async formData => {
     try {
       const call = selectedEvent
-        ? api.put(`/events/${selectedEvent._id}`, formData)
-        : api.post('/events', formData);
-      
+        ? updateEvent(selectedEvent._id, formData)
+        : createEvent(formData);
       const { data } = await call;
       if (selectedEvent) {
         setEvents(es => es.map(e => e._id === selectedEvent._id ? { ...data.data, _id: data.data._id } : e));
@@ -147,7 +146,7 @@ export default function OrganizerPanel() {
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="sold" fill="#FF5700" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="sold" fill="#3B82F6" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

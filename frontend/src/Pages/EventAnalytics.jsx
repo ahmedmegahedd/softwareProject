@@ -3,6 +3,8 @@ import { getEventAnalytics } from '../api';
 import { toast } from 'react-toastify';
 import { useAuthState } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export default function EventAnalytics() {
   const [events, setEvents] = useState([]);
@@ -17,6 +19,7 @@ export default function EventAnalytics() {
       return;
     }
     fetchEvents();
+    AOS.init({ duration: 700, once: true });
   }, [user, navigate]);
 
   const fetchEvents = async () => {
@@ -62,7 +65,7 @@ export default function EventAnalytics() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" data-aos="fade-up">
       <h1 className="text-3xl font-bold text-white mb-6">
         {user.role === 'admin' ? 'All Events Analytics' : 'My Events Analytics'}
       </h1>
@@ -79,7 +82,7 @@ export default function EventAnalytics() {
           const status = event?.status || 'pending';
 
           return (
-            <div key={event?.id || Math.random()} className="bg-neutral-900 rounded-lg shadow-md p-6">
+            <div key={event?.id || Math.random()} data-aos="fade-up" className="bg-neutral-900 rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4 text-white">{event?.title || 'Untitled Event'}</h2>
               
               <div className="space-y-4">

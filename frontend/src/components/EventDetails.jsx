@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import api from '../api';
+import { bookEvent } from '../api';
 import Spinner from './Spinner';
 
 export default function EventDetails() {
@@ -30,7 +30,7 @@ export default function EventDetails() {
   const total = event.price * qty;
   const handleBook = async () => {
     try {
-      await api.post('/api/v1/bookings', { eventId: id, tickets: qty });
+      await bookEvent(id, { tickets: qty });
       toast.success('Booking confirmed');
       setAvail(prev => prev - qty);
     } catch {
@@ -57,7 +57,7 @@ export default function EventDetails() {
           <div>
             <span
               className={`px-3 py-1 rounded-full ${
-                avail > 0 ? 'bg-accentLight text-secondary' : 'bg-gray-200 text-gray-500'
+                avail > 0 ? 'bg-primary/10 text-primary' : 'bg-gray-200 text-gray-500'
               }`}
             >
               {avail > 0 ? `Only ${avail} left` : 'Sold Out'}

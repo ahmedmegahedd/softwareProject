@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 
 // Always use the provided Atlas connection string
-const MONGO_URI = 'mongodb+srv://loaimohamedfarrag:Mongo%40SW25@cluster0.lymhh.mongodb.net/Software?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGODB_URI;
 
 mongoose.connect(MONGO_URI)
   .then(async () => {

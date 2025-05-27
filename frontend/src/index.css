@@ -7,55 +7,82 @@ html, body, #root {
 }
 /* Custom theme variables for use in plain CSS (not with @apply) */
 :root {
-  --color-primary: #1E90FF;
-  --color-bg: #000000;
-  --color-text: #FFFFFF;
-  --color-secondary: #1F2937;
+  --color-primary: #3B82F6;
+  --color-secondary: #10B981;
+  --color-accent: #F59E0B;
+  --color-background: #F9FAFB;
+  --color-surface: #FFFFFF;
+  --color-text: #111827;
+  --color-text-light: #F3F4F6;
+  --color-text-secondary: #6B7280;
+  --color-success: #10B981;
+  --color-warning: #FBBF24;
+  --color-error: #EF4444;
+  --color-border: #F2F2F2;
   --color-accent-light: #1E90FF22;
   --radius-lg: 1rem;
+}
+[data-theme='dark'] {
+  --color-background: #1F2937;
+  --color-surface: #111827;
+  --color-text: #F3F4F6;
+  --color-text-light: #D1D5DB;
+  --color-text-secondary: #9CA3AF;
+  --color-primary: #3B82F6;
+  --color-secondary: #10B981;
+  --color-accent: #3B82F6;
+  --color-success: #10B981;
+  --color-warning: #FBBF24;
+  --color-error: #EF4444;
+  --color-border: #374151;
+  --color-accent-light: #1E90FF22;
 }
 
 body {
   @apply bg-background text-text font-sans antialiased;
+  font-family: 'Inter', system-ui, sans-serif;
   /* If you want to use your variables, do it in plain CSS: */
   /* background: var(--color-bg); color: var(--color-secondary); */
 }
 
 /* Button styles */
 .btn {
-  @apply px-5 py-2 rounded-xl font-semibold transition-all duration-200;
+  @apply px-5 py-2 font-semibold transition-all duration-200 rounded;
 }
 .btn-primary {
-  @apply bg-primary text-white hover:bg-primary/90 hover:shadow-lg active:scale-95;
+  @apply bg-primary text-white rounded hover:bg-blue-700 active:scale-95 shadow-sm;
 }
 .btn-secondary {
-  @apply bg-white text-primary border-2 border-primary hover:bg-primary/10 active:scale-95;
+  @apply bg-surface text-primary border border-primary rounded hover:bg-primary/10 active:scale-95 shadow-sm;
 }
 .btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700 hover:shadow-lg active:scale-95;
+  @apply bg-error text-white rounded hover:bg-red-700 active:scale-95 shadow-sm;
 }
 
 /* Card component */
 .card {
-  @apply bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200;
+  @apply bg-surface rounded-lg shadow p-6;
 }
 
 /* Form elements */
 .form-input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  @apply w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-text;
 }
 .form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
+  @apply block text-sm font-medium text-primary mb-1;
 }
 .form-error {
-  @apply text-red-600 text-sm mt-1;
+  @apply text-error text-sm mt-1;
 }
 
 /* Typography */
-.h1 { @apply text-4xl font-extrabold mb-4; }
-.h2 { @apply text-2xl font-semibold mb-3; }
-.h3 { @apply text-xl font-semibold mb-2; }
-.p { @apply mb-2 leading-relaxed; }
+h1, .h1 { @apply text-4xl font-bold mb-4 text-text; font-family: 'Inter', sans-serif; letter-spacing: 0.01em; }
+h2, .h2 { @apply text-2xl font-semibold mb-3 text-text; font-family: 'Inter', sans-serif; }
+h3, .h3 { @apply text-xl font-semibold mb-2 text-text; font-family: 'Inter', sans-serif; }
+h4, .h4 { @apply text-lg font-semibold mb-2 text-text; font-family: 'Inter', sans-serif; }
+h5, .h5 { @apply text-base font-semibold mb-2 text-text; font-family: 'Inter', sans-serif; }
+h6, .h6 { @apply text-sm font-semibold mb-2 text-text; font-family: 'Inter', sans-serif; }
+p, label, input, button { font-size: 1rem; line-height: 1.5; }
 
 /* Layout */
 .flex-center { @apply flex items-center justify-center; }
@@ -85,3 +112,34 @@ body {
 /* Utility classes */
 .mt-section { @apply mt-8; }
 .px-section { @apply px-4 md:px-8; }
+
+.badge {
+  @apply inline-block rounded-full px-3 py-1 font-medium text-white text-sm;
+}
+.badge-success { @apply bg-success; }
+.badge-warning { @apply bg-warning; }
+.badge-error { @apply bg-error; }
+
+.search-bar {
+  @apply flex items-center bg-surface rounded-lg shadow-inner px-4 py-2;
+}
+.search-bar input {
+  @apply flex-1 bg-transparent outline-none text-text placeholder-textSecondary text-lg px-2 py-2 border-none;
+}
+.search-bar input:focus {
+  outline: 2px solid var(--color-secondary);
+}
+.search-bar .icon {
+  color: var(--color-primary);
+  margin-right: 0.75rem;
+}
+
+.animated-gradient {
+  background: linear-gradient(270deg, #3B82F6, #10B981, #F59E0B, #3B82F6);
+  background-size: 600% 600%;
+  animation: gradientBG 16s ease infinite;
+}
+@keyframes gradientBG {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}

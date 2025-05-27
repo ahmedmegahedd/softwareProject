@@ -47,28 +47,31 @@ export default function UserDashboard() {
         </div>
       ) : (
         <div className="overflow-auto mt-section">
-          <table className="min-w-full card">
+          <table className="min-w-full rounded-xl overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left">Event</th>
-                <th className="px-6 py-3 text-left">Tickets</th>
-                <th className="px-6 py-3 text-left">Status</th>
-                <th className="px-6 py-3 text-left">Actions</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">Event</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">Tickets</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {bookings.map(b => (
-                <tr key={b.id} className="border-t">
+              {bookings.map((b, idx) => (
+                <tr
+                  key={b.id}
+                  className={`border-t ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-primary/10 transition`}
+                >
                   <td className="px-6 py-4 flex items-center space-x-4">
                     <img
                       src={b.event.image || '/placeholder.jpg'}
                       alt={b.event.title}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
-                    <span className="text-secondary">{b.event.title}</span>
+                    <span className="text-secondary">{typeof b.event.title === 'string' ? b.event.title : String(b.event.title)}</span>
                   </td>
-                  <td className="px-6 py-4">{b.tickets}</td>
-                  <td className="px-6 py-4 capitalize">{b.status}</td>
+                  <td className="px-6 py-4">{typeof b.tickets === 'number' ? b.tickets : String(b.tickets)}</td>
+                  <td className="px-6 py-4 capitalize">{typeof b.status === 'string' ? b.status : String(b.status)}</td>
                   <td className="px-6 py-4">
                     {b.status === 'confirmed' && (
                       <button

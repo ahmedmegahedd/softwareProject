@@ -209,9 +209,7 @@ export default function EventForm() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300">
-              Title *
-            </label>
+            <label htmlFor="title" className="form-label text-gray-300">Title *</label>
             <input
               type="text"
               id="title"
@@ -220,14 +218,11 @@ export default function EventForm() {
               onChange={handleChange}
               required
               minLength={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-300">
-              Description *
-            </label>
+            <label htmlFor="description" className="form-label text-gray-300">Description *</label>
             <textarea
               id="description"
               name="description"
@@ -236,14 +231,11 @@ export default function EventForm() {
               required
               minLength={10}
               rows={4}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-300">
-              Date *
-            </label>
+            <label htmlFor="date" className="form-label text-gray-300">Date *</label>
             <input
               type="date"
               id="date"
@@ -252,14 +244,11 @@ export default function EventForm() {
               onChange={handleChange}
               required
               min={new Date().toISOString().split('T')[0]}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-300">
-              Location *
-            </label>
+            <label htmlFor="location" className="form-label text-gray-300">Location *</label>
             <input
               type="text"
               id="location"
@@ -267,14 +256,11 @@ export default function EventForm() {
               value={formData.location}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-300">
-              Price (USD) *
-            </label>
+            <label htmlFor="price" className="form-label text-gray-300">Price (USD) *</label>
             <input
               type="number"
               id="price"
@@ -284,14 +270,11 @@ export default function EventForm() {
               required
               min="0"
               step="0.01"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="ticketsAvailable" className="block text-sm font-medium text-gray-300">
-              Number of Tickets *
-            </label>
+            <label htmlFor="ticketsAvailable" className="form-label text-gray-300">Number of Tickets *</label>
             <input
               type="number"
               id="ticketsAvailable"
@@ -300,20 +283,17 @@ export default function EventForm() {
               onChange={handleChange}
               required
               min="1"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             />
           </div>
-
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-300">
-              Category
-            </label>
+            <label htmlFor="category" className="form-label text-gray-300">Category</label>
             <select
               id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+              className="form-input"
             >
               <option value="concert">Concert</option>
               <option value="conference">Conference</option>
@@ -322,18 +302,15 @@ export default function EventForm() {
               <option value="other">Other</option>
             </select>
           </div>
-
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-300">
-              Event Image
-            </label>
+            <label htmlFor="image" className="form-label text-gray-300">Event Image</label>
             <input
               type="file"
               id="image"
               name="image"
               accept="image/*"
               onChange={handleChange}
-              className="mt-1 block w-full"
+              className="form-input"
             />
             {imagePreview && (
               <div className="mt-2">
@@ -345,19 +322,18 @@ export default function EventForm() {
               </div>
             )}
           </div>
-
           <div className="flex justify-end space-x-3">
             <button
               type="button"
               onClick={() => navigate('/my-events')}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="btn btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+              className="btn btn-primary"
             >
               {loading ? 'Saving...' : isEditing ? 'Update Event' : 'Create Event'}
             </button>

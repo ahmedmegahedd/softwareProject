@@ -89,8 +89,9 @@ export default function RegisterForm() {
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="form-label">Full Name</label>
+            <label htmlFor="name" className="form-label">Full Name</label>
             <input
+              id="name"
               name="name"
               type="text"
               placeholder="Enter your full name"
@@ -98,11 +99,13 @@ export default function RegisterForm() {
               onChange={handleChange}
               required
               className="form-input"
+              autoComplete="name"
             />
           </div>
           <div>
-            <label className="form-label">Email</label>
+            <label htmlFor="email" className="form-label">Email</label>
             <input
+              id="email"
               name="email"
               type="email"
               placeholder="Enter your email"
@@ -110,11 +113,13 @@ export default function RegisterForm() {
               onChange={handleChange}
               required
               className="form-input"
+              autoComplete="email"
             />
           </div>
           <div>
-            <label className="form-label">Password</label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
+              id="password"
               name="password"
               type="password"
               placeholder="Enter your password (min 6 characters)"
@@ -123,11 +128,13 @@ export default function RegisterForm() {
               required
               minLength="6"
               className="form-input"
+              autoComplete="new-password"
             />
           </div>
           <div>
-            <label className="form-label">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
             <input
+              id="confirmPassword"
               name="confirmPassword"
               type="password"
               placeholder="Confirm your password"
@@ -136,11 +143,13 @@ export default function RegisterForm() {
               required
               minLength="6"
               className="form-input"
+              autoComplete="new-password"
             />
           </div>
           <div>
-            <label className="form-label">Role</label>
+            <label htmlFor="role" className="form-label">Role</label>
             <select
+              id="role"
               name="role"
               value={form.role}
               onChange={handleChange}

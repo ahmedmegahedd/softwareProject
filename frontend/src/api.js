@@ -74,7 +74,7 @@ export const getApprovedEvents = (search = '') => {
 };
 
 // Booking endpoints
-export const bookEvent = (id, bookingData) => api.post(`/events/${id}/bookings`, bookingData);
+export const bookEvent = (eventId, bookingData) => api.post(`/events/${eventId}/bookings`, bookingData);
 export const getBookings = () => api.get('/bookings');
 export const cancelBooking = (id) => api.delete(`/bookings/${id}`);
 
@@ -85,5 +85,8 @@ export const getAllUsers = () => api.get('/users');
 export const getUserById = (id) => api.get(`/users/${id}`);
 export const updateUserRole = (id, role) => api.patch(`/users/${id}`, { role });
 export const deleteUser = (id) => api.delete(`/users/${id}`);
+
+// Event status update (admin)
+export const updateEventStatus = (id, status) => api.patch(`/events/${id}`, { status });
 
 export default api;
