@@ -66,8 +66,9 @@ exports.bookTickets = async (req, res) => {
 // 2. List Current User's Bookings
 exports.getUserBookings = async (req, res) => {
   try {
+    const filter = req.user.role === 'admin' ? {} : { user: req.user.id };
     const bookings = await Booking
-      .find({ user: req.user.id })
+      .find(filter)
       .populate('event', 'title date location price')
       .sort({ createdAt: -1 });
     return res.status(200).json({ success: true, data: bookings });
@@ -161,6 +162,69 @@ exports.cancelBooking = async (req, res) => {
     return res.status(500).json({ 
       success: false, 
       error: 'Failed to cancel booking' 
+    });
+  }
+};
+
+// 5. Partial Cancel Booking (Standard User only)
+exports.partialCancelBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Booking not found' 
+      });
+    }
+    if (booking.user.toString() !== req.user.id) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Access denied' 
+      });
+    }
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Booking already cancelled' 
+      });
+    }
+    const { tickets } = req.body;
+    if (!tickets || typeof tickets !== 'number' || tickets < 1 || tickets > booking.tickets) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid number of tickets to cancel' 
+      });
+    }
+    const event = await Event.findById(booking.event);
+    if (!event) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Associated event not found' 
+      });
+    }
+    // Refund tickets
+    event.ticketsAvailable += tickets;
+    await event.save();
+    if (tickets === booking.tickets) {
+      // Cancel all
+      booking.status = 'cancelled';
+      booking.tickets = 0;
+      booking.totalPrice = 0;
+    } else {
+      // Partial cancel
+      booking.tickets -= tickets;
+      booking.totalPrice = event.price * booking.tickets;
+    }
+    await booking.save();
+    return res.status(200).json({ 
+      success: true, 
+      data: booking
+    });
+  } catch (err) {
+    console.error('partialCancelBooking error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Failed to partially cancel booking' 
     });
   }
 };

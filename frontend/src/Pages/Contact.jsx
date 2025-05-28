@@ -27,8 +27,8 @@ export default function Contact() {
   };
 
   return (
-    <div className="flex-center min-h-screen bg-background px-4">
-      <div className="bg-surface rounded-xl shadow-lg p-8 w-full max-w-lg border border-border flex flex-col items-center" data-aos="fade-up">
+    <div className="flex items-center justify-center min-h-screen w-full bg-background px-4">
+      <div className="bg-surface rounded-xl shadow-lg p-10 w-full max-w-2xl border border-border flex flex-col items-center" data-aos="fade-up">
         <h1 className="h1 mb-4 text-center">Contact Us</h1>
         <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md mx-auto">
           <div>

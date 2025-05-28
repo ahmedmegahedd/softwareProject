@@ -58,7 +58,7 @@ router.delete(
 router.get(
   '/bookings',
   auth,
-  checkRole('user'),
+  checkRole(['user', 'admin']),
   getUserBookings
 );
 

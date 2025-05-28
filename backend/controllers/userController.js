@@ -86,7 +86,8 @@ exports.deleteUser = async (req, res) => {
 // 7. User‑scoped: get current user's bookings
 exports.getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user.id }).populate('event');
+    const filter = req.user.role === 'admin' ? {} : { user: req.user.id };
+    const bookings = await Booking.find(filter).populate('event');
     return res.status(200).json({ success: true, data: bookings });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Server error' });

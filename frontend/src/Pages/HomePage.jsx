@@ -138,12 +138,12 @@ export default function HomePage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.4 }}
           >
-            <SearchBar
-              placeholder="Search events, venues..."
+        <SearchBar
+          placeholder="Search events, venues..."
               inputClassName="text-text placeholder-primary text-lg py-4 rounded-full bg-white shadow-none border-none"
-              onSearch={handleSearch}
+          onSearch={handleSearch}
               buttonClassName="px-8 py-3 bg-primary text-white rounded-full font-bold text-lg shadow-none hover:bg-primary/80 transition-colors"
-            />
+        />
           </motion.div>
         </div>
       </section>

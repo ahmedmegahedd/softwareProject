@@ -6,7 +6,8 @@ const {
   bookTickets,
   getUserBookings,
   getBookingById,
-  cancelBooking
+  cancelBooking,
+  partialCancelBooking
 } = require('../controllers/bookingController');
 
 const { auth, checkRole } = require('../middleware/auth');
@@ -48,7 +49,7 @@ router.post(
 router.get(
   '/',
   auth,
-  checkRole('user'),
+  checkRole(['user', 'admin']),
   getUserBookings
 );
 
@@ -66,6 +67,14 @@ router.delete(
   auth,
   checkRole('user'),
   cancelBooking
+);
+
+// 5. Partial cancel a booking (reduce tickets or cancel all)
+router.patch(
+  '/:id',
+  auth,
+  checkRole('user'),
+  partialCancelBooking
 );
 
 module.exports = router;

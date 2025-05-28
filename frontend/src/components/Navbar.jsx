@@ -27,6 +27,7 @@ export default function Navbar() {
             <Link to="/" className="btn btn-primary text-base rounded">Home</Link>
             {user && user.role === 'organizer' && (
               <>
+                <Link to="/my-events" className="btn btn-primary text-base rounded">My Events</Link>
                 <button
                   className="btn btn-primary text-base rounded"
                   onClick={() => navigate('/my-events/new')}
@@ -49,7 +50,16 @@ export default function Navbar() {
                 >
                   Unapproved Events
                 </button>
+                <button
+                  className="btn btn-secondary text-base rounded border-2 border-primary font-bold bg-white text-primary hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
+                  onClick={() => navigate('/admin')}
+                >
+                  Admin Panel
+                </button>
               </>
+            )}
+            {user && (user.role === 'user' || user.role === 'admin') && (
+              <Link to="/dashboard" className="btn btn-primary text-base rounded">My Bookings</Link>
             )}
             {user && (
               <Link to="/profile" className="btn btn-primary text-base rounded">Profile</Link>
