@@ -203,35 +203,49 @@ exports.logout = (req, res) => {
 // Password reset endpoint (send OTP)
 exports.forgetPassword = async (req, res) => {
   try {
+    // 1. Validate request body
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email is required' });
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ success: false, error: 'Valid email is required' });
     }
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+    // 2. Try to find user (do not reveal if not found)
+    let user;
+    try {
+      user = await User.findOne({ email });
+    } catch (dbErr) {
+      console.error('[forgetPassword] DB error:', dbErr);
+      return res.status(500).json({ success: false, error: 'Server error (db)' });
     }
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetOTP = otp;
-    user.resetOTPExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await user.save();
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+    // 3. If user found, generate OTP and send email
+    if (user) {
+      try {
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.resetOTP = otp;
+        user.resetOTPExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save();
+        // Send email
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          }
+        });
+        await transporter.sendMail({
+          to: user.email,
+          subject: 'Your OTP Code',
+          text: `Your OTP code is: ${otp}`
+        });
+      } catch (mailErr) {
+        // Log but do not reveal to client
+        console.error('[forgetPassword] Mail error:', mailErr);
+        // Continue to generic response
       }
-    });
-    await transporter.sendMail({
-      to: user.email,
-      subject: 'Your OTP Code',
-      text: `Your OTP code is: ${otp}`
-    });
-    return res.json({ success: true, message: 'OTP sent to email' });
+    }
+    // 4. Always respond with generic message
+    return res.status(200).json({ success: true, message: 'If this email exists, you will receive reset instructions.' });
   } catch (err) {
-    console.error('forgetPassword error:', err);
+    console.error('[forgetPassword] Unexpected error:', err);
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };

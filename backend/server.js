@@ -95,6 +95,13 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Startup environment check
+['MONGODB_URI', 'EMAIL_USER', 'EMAIL_PASS', 'JWT_SECRET'].forEach(key => {
+  if (!process.env[key]) {
+    console.error(`[Startup] Missing required environment variable: ${key}`);
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

@@ -1,3 +1,9 @@
+// .env example:
+// MONGODB_URI=your_mongodb_connection_string
+// EMAIL_USER=your_gmail_address
+// EMAIL_PASS=your_gmail_app_password
+// JWT_SECRET=your_jwt_secret
+
 const mongoose = require('mongoose');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -8,6 +14,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const connectDB = async () => {
     try {
         if (!MONGODB_URI) {
+            console.error('MONGODB_URI not set in .env');
             throw new Error('MONGODB_URI environment variable not set');
         }
         const conn = await mongoose.connect(MONGODB_URI);
